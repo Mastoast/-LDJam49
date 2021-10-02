@@ -1,25 +1,37 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://Objects/healer.tscn" type="PackedScene" id=1]
-[ext_resource path="res://Objects/mage.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Objects/rogue.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Objects/warrior.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Fonts/ARCADECLASSIC.TTF" type="DynamicFontData" id=5]
-[ext_resource path="res://Objects/demon.tscn" type="PackedScene" id=6]
 [ext_resource path="res://Sprites/environement.png" type="Texture" id=8]
 
 [sub_resource type="GDScript" id=19]
 script/source = "extends Node2D
 signal spawn_text
 
+var is_connected = true
+var difficulty_index = 0
+
+var demon_node = preload(\"res://Objects/demon.tscn\")
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	create_label(\"this is a test\", $mage.position, $mage.color)
+	pass
+	#create_label(\"this is a test\", $mage.position, $mage.color)
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+
+func _process(delta):
+	var demons = get_tree().get_nodes_in_group(\"monster\")
+	if demons.size() == 0:
+		difficulty_index += 1
+		for i in range(difficulty_index):
+			if i%2 == 0:
+				spawn(demon_node, $SpawnPosition.position)
+			else:
+				spawn(demon_node, $SpawnPosition2.position)
+
 
 func create_label(text : String, position : Vector2, color : Color):
 	var new_label = $TextLabel.duplicate()
@@ -28,6 +40,28 @@ func create_label(text : String, position : Vector2, color : Color):
 	new_label.set_position(Vector2(position.x - 60, position.y - 60))
 	new_label.add_color_override(\"default_color\", color)
 	new_label.start_timer()
+
+
+func spawn(node, position):
+	var new = node.instance()
+	new.position = Vector2(position.x + rand_range(-20, 20), position.y + rand_range(-20, 20))
+	get_parent().add_child(new)
+
+
+func _on_Button_pressed():
+	if is_connected:
+		$Popup.visible = false
+	else:
+		open_popup()
+
+func open_popup():
+	$Popup.popup_centered()
+	# TODO play error sound
+
+
+func _on_ErrorTimer_timeout():
+	if !$Popup.visible:
+		open_popup()
 "
 
 [sub_resource type="Gradient" id=20]
@@ -65,13 +99,17 @@ func _on_Timer_timeout():
 	queue_free()
 "
 
+[sub_resource type="DynamicFont" id=26]
+extra_spacing_space = 2
+font_data = ExtResource( 5 )
+
 [node name="MMO" type="Node2D"]
 script = SubResource( 19 )
 
 [node name="background" type="Node2D" parent="."]
 
 [node name="Background" type="Sprite" parent="background"]
-position = Vector2( 512, 302.492 )
+position = Vector2( 512, 300 )
 scale = Vector2( 512, 594.318 )
 texture = SubResource( 21 )
 
@@ -124,9 +162,7 @@ texture = ExtResource( 8 )
 region_enabled = true
 region_rect = Rect2( 64, 0, 16, 16 )
 
-[node name="healer" parent="." groups=[
-"monster",
-] instance=ExtResource( 1 )]
+[node name="healer" parent="." instance=ExtResource( 1 )]
 position = Vector2( 255.179, 311.322 )
 
 [node name="warrior" parent="." instance=ExtResource( 4 )]
@@ -134,12 +170,6 @@ position = Vector2( 377.753, 309.005 )
 
 [node name="rogue" parent="." instance=ExtResource( 3 )]
 position = Vector2( 335.577, 238.423 )
-
-[node name="mage" parent="." instance=ExtResource( 2 )]
-position = Vector2( 329.991, 425.72 )
-
-[node name="demon" parent="." instance=ExtResource( 6 )]
-position = Vector2( 791.529, 311.213 )
 
 [node name="Wall" type="StaticBody2D" parent="."]
 position = Vector2( -19.5096, 298.597 )
@@ -153,7 +183,7 @@ texture = SubResource( 23 )
 shape = SubResource( 24 )
 
 [node name="Wall2" type="StaticBody2D" parent="."]
-position = Vector2( 1044.36, 276.597 )
+position = Vector2( 1044.48, 272.308 )
 scale = Vector2( -0.923225, -18.1661 )
 
 [node name="Sprite" type="Sprite" parent="Wall2"]
@@ -205,10 +235,78 @@ __meta__ = {
 [node name="Timer" type="Timer" parent="TextLabel"]
 wait_time = 3.0
 one_shot = true
-autostart = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2( 512, 300 )
 current = true
 
+[node name="Popup" type="Popup" parent="."]
+margin_left = 316.923
+margin_top = 245.155
+margin_right = 704.923
+margin_bottom = 366.155
+popup_exclusive = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel" type="Panel" parent="Popup"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="ColorRect" type="ColorRect" parent="Popup/Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = 3.05176e-05
+margin_bottom = -101.0
+color = Color( 0.607843, 0.607843, 0.607843, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Popup/Panel/ColorRect"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 136.341
+margin_right = -127.659
+custom_fonts/normal_font = SubResource( 26 )
+text = "Disconnected !"
+scroll_active = false
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Popup/Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = 22.0
+margin_right = -10.0
+custom_fonts/normal_font = SubResource( 26 )
+text = "Please check your internet connnection and try again
+(Error Code: 666)"
+scroll_active = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Button" type="Button" parent="Popup/Panel"]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+margin_left = -20.0
+margin_top = -31.3461
+margin_right = 19.0
+margin_bottom = -11.3461
+text = "Retry"
+
+[node name="ErrorTimer" type="Timer" parent="."]
+wait_time = 3.0
+
+[node name="SpawnPosition" type="Position2D" parent="."]
+position = Vector2( 971.963, 540.247 )
+
+[node name="SpawnPosition2" type="Position2D" parent="."]
+position = Vector2( 974.792, 59.4149 )
+
 [connection signal="timeout" from="TextLabel/Timer" to="TextLabel" method="_on_Timer_timeout"]
+[connection signal="pressed" from="Popup/Panel/Button" to="." method="_on_Button_pressed"]
+[connection signal="timeout" from="ErrorTimer" to="." method="_on_ErrorTimer_timeout"]

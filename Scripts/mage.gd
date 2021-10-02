@@ -10,6 +10,7 @@ func _process(delta):
 		shoot()
 
 func shoot():
+	emit_signal("spawn_text", "test", self.position, self.color)
 	$AnimatedSprite.play("attacking")
 	var new_ball = fireball.instance()
 	get_parent().add_child(new_ball)

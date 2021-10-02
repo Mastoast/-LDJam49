@@ -73,13 +73,13 @@ extents = Vector2( 15.8684, 21.836 )
 "player",
 ]]
 collision_layer = 2
+collision_mask = 5
 script = ExtResource( 3 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 scale = Vector2( 5, 5 )
 frames = SubResource( 10 )
 animation = "idle"
-frame = 1
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -99,10 +99,15 @@ __meta__ = {
 }
 
 [node name="HitZone" type="Area2D" parent="."]
+position = Vector2( 29.3665, 3.33711 )
+scale = Vector2( 1, 1.11014 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitZone"]
-position = Vector2( 26.2815, 3.56358 )
 shape = SubResource( 12 )
+
+[node name="AttackTimer" type="Timer" parent="."]
+wait_time = 0.4
 
 [connection signal="body_entered" from="HitZone" to="." method="_on_hit_zone_body_entered"]
 [connection signal="body_exited" from="HitZone" to="." method="_on_hit_zone_body_exited"]
+[connection signal="timeout" from="AttackTimer" to="." method="_on_AttackTimer_timeout"]

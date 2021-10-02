@@ -1,6 +1,6 @@
 [gd_scene load_steps=13 format=2]
 
-[ext_resource path="res://Sprites/healthSprite.png" type="Texture" id=1]
+[ext_resource path="res://Sprites/healthSpriteRed.png" type="Texture" id=1]
 [ext_resource path="res://Sprites/demon_1.png" type="Texture" id=2]
 
 [sub_resource type="GDScript" id=12]
@@ -8,15 +8,20 @@ script/source = "extends KinematicBody2D
 
 const WALK_SPEED = 5
 
+var fire_explosion = preload(\"res://Objects/fire_explosion.tscn\").instance()
+
 var life = 100
 var velocity = Vector2()
 var is_attacking = false
 var color = Color.red
+var damage = 2
 
-var target = Vector2()
+var target
 
 func _ready():
-	pass
+	$AttackTimer.paused = false
+	$AttackTimer.start()
+	target = get_nearest_node_in_group(\"player\")
 
 func _process(delta):
 	pass
@@ -39,18 +44,18 @@ func _process(delta):
 		$AnimatedSprite.flip_h = true
 
 func _physics_process(delta):
-	if is_attacking or life <= 0 or target == Vector2.ZERO:
+	if is_attacking or life <= 0 or !is_instance_valid(target):
 		return
-	if target.x < self.get_global_transform().get_origin().x:
+	if target.get_global_transform().get_origin().x + WALK_SPEED < self.get_global_transform().get_origin().x:
 		velocity.x = -WALK_SPEED
-	elif target.x > self.get_global_transform().get_origin().x:
+	elif target.get_global_transform().get_origin().x - WALK_SPEED > self.get_global_transform().get_origin().x:
 		velocity.x =  WALK_SPEED
 	else:
 		velocity.x = 0
 		
-	if target.y > get_global_transform().get_origin().y:
+	if target.get_global_transform().get_origin().y - WALK_SPEED > get_global_transform().get_origin().y:
 		velocity.y = WALK_SPEED
-	elif target.y < get_global_transform().get_origin().y:
+	elif target.get_global_transform().get_origin().y + WALK_SPEED < get_global_transform().get_origin().y:
 		velocity.y =  -WALK_SPEED
 	else:
 		velocity.y = 0
@@ -62,24 +67,48 @@ func hit(damage):
 	if life <= 0:
 		$AnimatedSprite.animation = \"dead\"
 		die()
+		return true
 
 func die():
-	get_parent().add_child($AnimatedSprite)
+	fire_explosion.position = self.position
+	get_parent().add_child(fire_explosion)
 	queue_free()
 
+func get_nearest_node_in_group(group_name):
+	var nodes = get_tree().get_nodes_in_group(group_name)
+	if nodes.size() == 0:
+		return null
+		
+	var nearest_node
+
+	# look through spawn nodes to see if any are closer
+	for node in nodes:
+		if node.life < 0:
+			continue
+		if nearest_node == null:
+			nearest_node = node
+		if node.global_position.distance_to(global_position) < nearest_node.global_position.distance_to(global_position):
+			nearest_node = node
+	return nearest_node
 
 func _on_Area2D_body_entered(body):
 	if body.is_in_group(\"player\"):
+		target = null
 		is_attacking = true
 
-
-func _on_Area2D_body_exited(body):
-	if body.is_in_group(\"player\"):
-		var bodies = $Area2D.get_overlapping_bodies()
-		for body in bodies:
+func _on_AttackTimer_timeout():
+	var bodies = $Area2D.get_overlapping_bodies()
+	var hit_enemy = false
+	for body in bodies:
 			if body.is_in_group(\"player\"):
-				return
+				body.hit(damage)
+				hit_enemy = true
+				target = null
+				is_attacking = true
+	if !hit_enemy:
+		target = get_nearest_node_in_group(\"player\")
 		is_attacking = false
+		$AnimatedSprite.animation = \"idle\"
 "
 
 [sub_resource type="AtlasTexture" id=13]
@@ -133,12 +162,14 @@ animations = [ {
 extents = Vector2( 10.459, 30.311 )
 
 [sub_resource type="RectangleShape2D" id=19]
+extents = Vector2( 10.5568, 24.8787 )
 
 [node name="demon" type="KinematicBody2D" groups=[
 "monster",
 ]]
 position = Vector2( 601.041, 349.311 )
-collision_layer = 2
+collision_layer = 4
+collision_mask = 3
 script = SubResource( 12 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
@@ -160,7 +191,7 @@ margin_bottom = -44.0
 rect_scale = Vector2( 2, 2 )
 value = 100.0
 texture_progress = ExtResource( 1 )
-tint_progress = Color( 1, 0, 0, 1 )
+tint_progress = Color( 0.788235, 0.0156863, 0.0156863, 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -168,8 +199,11 @@ __meta__ = {
 [node name="Area2D" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-position = Vector2( -23.9385, 1.88989 )
+position = Vector2( -24.2921, 4.01123 )
 shape = SubResource( 19 )
 
+[node name="AttackTimer" type="Timer" parent="."]
+wait_time = 0.4
+
 [connection signal="body_entered" from="Area2D" to="." method="_on_Area2D_body_entered"]
-[connection signal="body_exited" from="Area2D" to="." method="_on_Area2D_body_exited"]
+[connection signal="timeout" from="AttackTimer" to="." method="_on_AttackTimer_timeout"]
