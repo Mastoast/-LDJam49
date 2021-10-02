@@ -1,0 +1,214 @@
+[gd_scene load_steps=16 format=2]
+
+[ext_resource path="res://Objects/healer.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Objects/mage.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Objects/rogue.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Objects/warrior.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Fonts/ARCADECLASSIC.TTF" type="DynamicFontData" id=5]
+[ext_resource path="res://Objects/demon.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Sprites/environement.png" type="Texture" id=8]
+
+[sub_resource type="GDScript" id=19]
+script/source = "extends Node2D
+signal spawn_text
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	create_label(\"this is a test\", $mage.position, $mage.color)
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#	pass
+
+func create_label(text : String, position : Vector2, color : Color):
+	var new_label = $TextLabel.duplicate()
+	new_label.text = text
+	self.add_child(new_label)
+	new_label.set_position(Vector2(position.x - 60, position.y - 60))
+	new_label.add_color_override(\"default_color\", color)
+	new_label.start_timer()
+"
+
+[sub_resource type="Gradient" id=20]
+colors = PoolColorArray( 0.402679, 0.566406, 0.466635, 1, 0.320923, 0.933594, 0.431012, 0.231373 )
+
+[sub_resource type="GradientTexture" id=21]
+gradient = SubResource( 20 )
+width = 2
+
+[sub_resource type="Gradient" id=22]
+
+[sub_resource type="GradientTexture" id=23]
+gradient = SubResource( 22 )
+width = 40
+
+[sub_resource type="RectangleShape2D" id=24]
+extents = Vector2( 20.1526, 20.2968 )
+
+[sub_resource type="DynamicFont" id=18]
+size = 24
+extra_spacing_space = 2
+font_data = ExtResource( 5 )
+
+[sub_resource type="GDScript" id=25]
+script/source = "extends RichTextLabel
+
+func _ready():
+	pass
+
+func start_timer():
+	$Timer.paused = false
+	$Timer.start()
+
+func _on_Timer_timeout():
+	queue_free()
+"
+
+[node name="MMO" type="Node2D"]
+script = SubResource( 19 )
+
+[node name="background" type="Node2D" parent="."]
+
+[node name="Background" type="Sprite" parent="background"]
+position = Vector2( 512, 302.492 )
+scale = Vector2( 512, 594.318 )
+texture = SubResource( 21 )
+
+[node name="Sprite" type="Sprite" parent="background"]
+position = Vector2( 179.988, 475.784 )
+scale = Vector2( 5, 5 )
+texture = ExtResource( 8 )
+region_enabled = true
+region_rect = Rect2( 0, 0, 16, 16 )
+
+[node name="Sprite2" type="Sprite" parent="background"]
+position = Vector2( 158.58, 67.7083 )
+scale = Vector2( 5, 5 )
+texture = ExtResource( 8 )
+region_enabled = true
+region_rect = Rect2( 16, 0, 16, 16 )
+
+[node name="Sprite7" type="Sprite" parent="background"]
+position = Vector2( 508.393, 481.429 )
+scale = Vector2( 5, 5 )
+texture = ExtResource( 8 )
+region_enabled = true
+region_rect = Rect2( 16, 0, 16, 16 )
+
+[node name="Sprite8" type="Sprite" parent="background"]
+position = Vector2( 706.661, 168.202 )
+scale = Vector2( 5, 5 )
+texture = ExtResource( 8 )
+region_enabled = true
+region_rect = Rect2( 16, 0, 16, 16 )
+
+[node name="Sprite3" type="Sprite" parent="background"]
+position = Vector2( 438.949, 106.59 )
+scale = Vector2( 5, 5 )
+texture = ExtResource( 8 )
+region_enabled = true
+region_rect = Rect2( 32, 0, 16, 16 )
+
+[node name="Sprite4" type="Sprite" parent="background"]
+position = Vector2( 824.235, 136.762 )
+scale = Vector2( 5, 5 )
+texture = ExtResource( 8 )
+region_enabled = true
+region_rect = Rect2( 48, 0, 16, 16 )
+
+[node name="Sprite5" type="Sprite" parent="background"]
+position = Vector2( 533.039, 197.106 )
+scale = Vector2( 5, 5 )
+texture = ExtResource( 8 )
+region_enabled = true
+region_rect = Rect2( 64, 0, 16, 16 )
+
+[node name="healer" parent="." groups=[
+"monster",
+] instance=ExtResource( 1 )]
+position = Vector2( 255.179, 311.322 )
+
+[node name="warrior" parent="." instance=ExtResource( 4 )]
+position = Vector2( 377.753, 309.005 )
+
+[node name="rogue" parent="." instance=ExtResource( 3 )]
+position = Vector2( 335.577, 238.423 )
+
+[node name="mage" parent="." instance=ExtResource( 2 )]
+position = Vector2( 329.991, 425.72 )
+
+[node name="demon" parent="." instance=ExtResource( 6 )]
+position = Vector2( 791.529, 311.213 )
+
+[node name="Wall" type="StaticBody2D" parent="."]
+position = Vector2( -19.5096, 298.597 )
+scale = Vector2( 1, 15.4 )
+
+[node name="Sprite" type="Sprite" parent="Wall"]
+scale = Vector2( 1, 40 )
+texture = SubResource( 23 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall"]
+shape = SubResource( 24 )
+
+[node name="Wall2" type="StaticBody2D" parent="."]
+position = Vector2( 1044.36, 276.597 )
+scale = Vector2( -0.923225, -18.1661 )
+
+[node name="Sprite" type="Sprite" parent="Wall2"]
+scale = Vector2( 1, 40 )
+texture = SubResource( 23 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall2"]
+shape = SubResource( 24 )
+
+[node name="Wall3" type="StaticBody2D" parent="."]
+position = Vector2( 507.704, -20.2805 )
+rotation = 1.5708
+scale = Vector2( 1.05352, 26.011 )
+
+[node name="Sprite" type="Sprite" parent="Wall3"]
+scale = Vector2( 1, 40 )
+texture = SubResource( 23 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall3"]
+shape = SubResource( 24 )
+
+[node name="Wall4" type="StaticBody2D" parent="."]
+position = Vector2( 509.599, 622.356 )
+rotation = 1.5708
+scale = Vector2( 1.01167, 26.3355 )
+
+[node name="Sprite" type="Sprite" parent="Wall4"]
+scale = Vector2( 1, 40 )
+texture = SubResource( 23 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall4"]
+shape = SubResource( 24 )
+
+[node name="TextLabel" type="RichTextLabel" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -211.0
+margin_top = -82.0
+margin_right = 211.0
+margin_bottom = -46.0
+custom_fonts/normal_font = SubResource( 18 )
+fit_content_height = true
+scroll_active = false
+script = SubResource( 25 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Timer" type="Timer" parent="TextLabel"]
+wait_time = 3.0
+one_shot = true
+autostart = true
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2( 512, 300 )
+current = true
+
+[connection signal="timeout" from="TextLabel/Timer" to="TextLabel" method="_on_Timer_timeout"]

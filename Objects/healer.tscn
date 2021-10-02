@@ -1,0 +1,181 @@
+[gd_scene load_steps=17 format=2]
+
+[ext_resource path="res://Sprites/healer.png" type="Texture" id=1]
+[ext_resource path="res://Sprites/healthSprite.png" type="Texture" id=2]
+[ext_resource path="res://Fonts/Retro Gaming.ttf" type="DynamicFontData" id=3]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends KinematicBody2D
+
+
+const WALK_SPEED = 5
+
+var life = 100
+var velocity = Vector2()
+var is_attacking = false
+var color = Color.darkolivegreen
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+func _process(delta):
+	if Input.is_action_pressed(\"ui_accept\"):
+		is_attacking = true
+		attack()
+	else:
+		is_attacking = false
+
+	# UI
+	$HealthBar.value = life
+	
+	if life <= 0:
+		$AnimatedSprite.animation = \"dead\"
+		return
+	elif is_attacking:
+		$AnimatedSprite.animation = \"attacking\"
+	elif velocity == Vector2.ZERO:
+		$AnimatedSprite.animation = \"idle\"
+	else:
+		$AnimatedSprite.animation = \"running\"
+
+	if velocity.x > 0:
+		$AnimatedSprite.flip_h = false
+	elif velocity.x < 0:
+		$AnimatedSprite.flip_h = true
+
+func _physics_process(delta):
+	if is_attacking or life <= 0:
+		return
+	
+	if Input.is_action_pressed(\"ui_left\"):
+		velocity.x = -WALK_SPEED
+	elif Input.is_action_pressed(\"ui_right\"):
+		velocity.x =  WALK_SPEED
+	else:
+		velocity.x = 0
+		
+	if Input.is_action_pressed(\"ui_down\"):
+		velocity.y = WALK_SPEED
+	elif Input.is_action_pressed(\"ui_up\"):
+		velocity.y =  -WALK_SPEED
+	else:
+		velocity.y = 0
+
+
+	move_and_collide(velocity)
+
+func attack():
+	pass
+	# TODO heal
+	
+func hit(damage):
+	life = max(0, life - damage)
+	if life <= 0:
+		$AnimatedSprite.animation = \"dead\"
+"
+
+[sub_resource type="AtlasTexture" id=2]
+atlas = ExtResource( 1 )
+region = Rect2( 0, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=3]
+atlas = ExtResource( 1 )
+region = Rect2( 16, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=4]
+atlas = ExtResource( 1 )
+region = Rect2( 32, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=5]
+atlas = ExtResource( 1 )
+region = Rect2( 48, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=6]
+atlas = ExtResource( 1 )
+region = Rect2( 64, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=7]
+atlas = ExtResource( 1 )
+region = Rect2( 80, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=8]
+atlas = ExtResource( 1 )
+region = Rect2( 112, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=9]
+atlas = ExtResource( 1 )
+region = Rect2( 0, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=10]
+atlas = ExtResource( 1 )
+region = Rect2( 96, 0, 16, 16 )
+
+[sub_resource type="SpriteFrames" id=11]
+animations = [ {
+"frames": [ SubResource( 2 ), SubResource( 3 ) ],
+"loop": true,
+"name": "idle",
+"speed": 3.0
+}, {
+"frames": [ SubResource( 4 ), SubResource( 5 ), SubResource( 6 ), SubResource( 7 ) ],
+"loop": true,
+"name": "running",
+"speed": 5.0
+}, {
+"frames": [ SubResource( 8 ) ],
+"loop": true,
+"name": "dead",
+"speed": 5.0
+}, {
+"frames": [ SubResource( 9 ), SubResource( 10 ) ],
+"loop": true,
+"name": "attacking",
+"speed": 5.0
+} ]
+
+[sub_resource type="RectangleShape2D" id=12]
+extents = Vector2( 12.2867, 22.0602 )
+
+[sub_resource type="DynamicFont" id=13]
+font_data = ExtResource( 3 )
+
+[node name="healer" type="KinematicBody2D" groups=[
+"player",
+]]
+collision_layer = 2
+script = SubResource( 1 )
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+scale = Vector2( 5, 5 )
+frames = SubResource( 11 )
+animation = "idle"
+playing = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( -4.5, 6.5 )
+shape = SubResource( 12 )
+
+[node name="HealthBar" type="TextureProgress" parent="."]
+margin_left = -18.0
+margin_top = -46.0
+margin_right = -2.0
+margin_bottom = -44.0
+rect_scale = Vector2( 2, 2 )
+value = 100.0
+texture_progress = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="text" type="RichTextLabel" parent="."]
+grow_vertical = 0
+custom_fonts/normal_font = SubResource( 13 )
+text = "more than i aleardy wrotet now but it can be far more than i aleardy wroteyrt"
+fit_content_height = true
+scroll_active = false
+__meta__ = {
+"_edit_use_anchors_": false
+}

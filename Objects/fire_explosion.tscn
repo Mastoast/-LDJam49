@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Scripts/fire_explosion.gd" type="Script" id=1]
+
+[sub_resource type="Gradient" id=1]
+colors = PoolColorArray( 0.652344, 0.170452, 0.022934, 1, 0.803922, 0.639216, 0.243137, 0.74902 )
+
+[node name="fire_explosion" type="CPUParticles2D"]
+position = Vector2( 606.814, 239.729 )
+scale = Vector2( 4, 4 )
+emitting = false
+amount = 32
+one_shot = true
+emission_shape = 3
+emission_points = PoolVector2Array(  )
+emission_colors = PoolColorArray(  )
+direction = Vector2( 0, 0 )
+spread = 180.0
+gravity = Vector2( 0, 0 )
+initial_velocity = 21.51
+initial_velocity_random = 0.44
+linear_accel = -30.0
+color_ramp = SubResource( 1 )
+script = ExtResource( 1 )

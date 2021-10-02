@@ -1,0 +1,45 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Sprites/fireball.png" type="Texture" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends KinematicBody2D
+
+var velocity = Vector2()
+var damage = 15
+
+var smoke = preload(\"res://Objects/smoke.tscn\").instance()
+var fire_explosion = preload(\"res://Objects/fire_explosion.tscn\").instance()
+
+func _ready():
+	pass # Replace with function body.
+
+
+func _physics_process(delta):
+	var collision = move_and_collide(velocity)
+	if collision != null and collision.collider != null:
+		if collision.collider.is_in_group(\"player\") or collision.collider.is_in_group(\"monster\"):
+			collision.collider.hit(damage)
+		# Instance effects
+		smoke.position = self.position
+		get_parent().add_child(smoke)
+		fire_explosion.position = self.position
+		get_parent().add_child(fire_explosion)
+		# Free node
+		queue_free()
+"
+
+[sub_resource type="CircleShape2D" id=2]
+radius = 12.1702
+
+[node name="Fireball" type="KinematicBody2D"]
+position = Vector2( 536.524, 367.089 )
+collision_mask = 2
+script = SubResource( 1 )
+
+[node name="sprite" type="Sprite" parent="."]
+scale = Vector2( 4, 4 )
+texture = ExtResource( 1 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 2 )
