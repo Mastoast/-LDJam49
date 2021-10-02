@@ -1,8 +1,6 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://Objects/healer.tscn" type="PackedScene" id=1]
-[ext_resource path="res://Objects/rogue.tscn" type="PackedScene" id=3]
-[ext_resource path="res://Objects/warrior.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Fonts/ARCADECLASSIC.TTF" type="DynamicFontData" id=5]
 [ext_resource path="res://Sprites/environement.png" type="Texture" id=8]
 
@@ -14,6 +12,7 @@ var is_connected = true
 var difficulty_index = 0
 
 var demon_node = preload(\"res://Objects/demon.tscn\")
+onready var spawn_points = [$SpawnPosition, $SpawnPosition2, $SpawnPosition3, $SpawnPosition4, $SpawnPosition5]
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -27,10 +26,7 @@ func _process(delta):
 	if demons.size() == 0:
 		difficulty_index += 1
 		for i in range(difficulty_index):
-			if i%2 == 0:
-				spawn(demon_node, $SpawnPosition.position)
-			else:
-				spawn(demon_node, $SpawnPosition2.position)
+			spawn(demon_node, spawn_points[spawn_points.size() % (i+1)].position)
 
 
 func create_label(text : String, position : Vector2, color : Color):
@@ -135,7 +131,7 @@ region_enabled = true
 region_rect = Rect2( 16, 0, 16, 16 )
 
 [node name="Sprite8" type="Sprite" parent="background"]
-position = Vector2( 706.661, 168.202 )
+position = Vector2( 123.336, 201.573 )
 scale = Vector2( 5, 5 )
 texture = ExtResource( 8 )
 region_enabled = true
@@ -149,14 +145,14 @@ region_enabled = true
 region_rect = Rect2( 32, 0, 16, 16 )
 
 [node name="Sprite4" type="Sprite" parent="background"]
-position = Vector2( 824.235, 136.762 )
+position = Vector2( 654.71, 71.3547 )
 scale = Vector2( 5, 5 )
 texture = ExtResource( 8 )
 region_enabled = true
 region_rect = Rect2( 48, 0, 16, 16 )
 
 [node name="Sprite5" type="Sprite" parent="background"]
-position = Vector2( 533.039, 197.106 )
+position = Vector2( 933.491, 346.608 )
 scale = Vector2( 5, 5 )
 texture = ExtResource( 8 )
 region_enabled = true
@@ -164,12 +160,6 @@ region_rect = Rect2( 64, 0, 16, 16 )
 
 [node name="healer" parent="." instance=ExtResource( 1 )]
 position = Vector2( 255.179, 311.322 )
-
-[node name="warrior" parent="." instance=ExtResource( 4 )]
-position = Vector2( 377.753, 309.005 )
-
-[node name="rogue" parent="." instance=ExtResource( 3 )]
-position = Vector2( 335.577, 238.423 )
 
 [node name="Wall" type="StaticBody2D" parent="."]
 position = Vector2( -19.5096, 298.597 )
@@ -302,10 +292,31 @@ text = "Retry"
 wait_time = 3.0
 
 [node name="SpawnPosition" type="Position2D" parent="."]
-position = Vector2( 971.963, 540.247 )
+position = Vector2( 597.809, 304.446 )
 
 [node name="SpawnPosition2" type="Position2D" parent="."]
-position = Vector2( 974.792, 59.4149 )
+position = Vector2( 665.993, 374.293 )
+
+[node name="SpawnPosition3" type="Position2D" parent="."]
+position = Vector2( 663.214, 241.754 )
+
+[node name="SpawnPosition4" type="Position2D" parent="."]
+position = Vector2( 727.593, 340.517 )
+
+[node name="SpawnPosition5" type="Position2D" parent="."]
+position = Vector2( 731.388, 256.432 )
+
+[node name="PlayerPosition1" type="Position2D" parent="."]
+position = Vector2( 425.413, 298.575 )
+
+[node name="PlayerPosition2" type="Position2D" parent="."]
+position = Vector2( 372.657, 251.432 )
+
+[node name="PlayerPosition3" type="Position2D" parent="."]
+position = Vector2( 360.31, 354.698 )
+
+[node name="PlayerPosition4" type="Position2D" parent="."]
+position = Vector2( 255.921, 313.167 )
 
 [connection signal="timeout" from="TextLabel/Timer" to="TextLabel" method="_on_Timer_timeout"]
 [connection signal="pressed" from="Popup/Panel/Button" to="." method="_on_Button_pressed"]

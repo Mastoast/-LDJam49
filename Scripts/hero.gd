@@ -46,19 +46,19 @@ func _physics_process(delta):
 		velocity = Vector2.ZERO
 		return
 	else:
-		if target.get_global_transform().get_origin().x + WALK_SPEED < self.get_global_transform().get_origin().x:
-			velocity.x = -WALK_SPEED
-		elif target.get_global_transform().get_origin().x - WALK_SPEED > self.get_global_transform().get_origin().x:
-			velocity.x =  WALK_SPEED
-		else:
-			velocity.x = 0
-			
+		# get the right height before moving forward
 		if target.get_global_transform().get_origin().y - WALK_SPEED > get_global_transform().get_origin().y:
 			velocity.y = WALK_SPEED
 		elif target.get_global_transform().get_origin().y + WALK_SPEED < get_global_transform().get_origin().y:
-			velocity.y =  -WALK_SPEED
+			velocity.y =  - WALK_SPEED
 		else:
 			velocity.y = 0
+			if target.get_global_transform().get_origin().x + WALK_SPEED < self.get_global_transform().get_origin().x:
+				velocity.x = - WALK_SPEED
+			elif target.get_global_transform().get_origin().x - WALK_SPEED > self.get_global_transform().get_origin().x:
+				velocity.x =  WALK_SPEED
+			else:
+				velocity.x = 0
 	
 	move_and_collide(velocity)
 
@@ -102,6 +102,8 @@ func _on_AttackTimer_timeout():
 		if body.is_in_group("monster"):
 			body.hit(damage)
 			hit_enemy = true
+			target = null
+			is_attacking = true
 	if !hit_enemy:
 		target = get_nearest_node_in_group("monster")
 		is_attacking = false

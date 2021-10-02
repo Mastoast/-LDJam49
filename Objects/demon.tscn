@@ -12,58 +12,48 @@ var fire_explosion = preload(\"res://Objects/fire_explosion.tscn\").instance()
 
 var life = 100
 var velocity = Vector2()
-var is_attacking = false
 var color = Color.red
 var damage = 2
-
-var target
+var position_target
 
 func _ready():
 	$AttackTimer.paused = false
 	$AttackTimer.start()
-	target = get_nearest_node_in_group(\"player\")
 
 func _process(delta):
-	pass
-
 	# UI
 	$HealthBar.value = life
 	
 	if life <= 0:
 		return
-	elif is_attacking:
-		$AnimatedSprite.animation = \"attacking\"
-	elif velocity == Vector2.ZERO:
-		$AnimatedSprite.animation = \"idle\"
-	else:
-		$AnimatedSprite.animation = \"running\"
 
 	if velocity.x > 0:
-		$AnimatedSprite.flip_h = false
+		self.scale.x = 1
 	elif velocity.x < 0:
-		$AnimatedSprite.flip_h = true
+		self.scale.x = -1
 
 func _physics_process(delta):
-	if is_attacking or life <= 0 or !is_instance_valid(target):
+	if !is_instance_valid(position_target):
 		return
-	if target.get_global_transform().get_origin().x + WALK_SPEED < self.get_global_transform().get_origin().x:
-		velocity.x = -WALK_SPEED
-	elif target.get_global_transform().get_origin().x - WALK_SPEED > self.get_global_transform().get_origin().x:
-		velocity.x =  WALK_SPEED
-	else:
-		velocity.x = 0
-		
-	if target.get_global_transform().get_origin().y - WALK_SPEED > get_global_transform().get_origin().y:
+
+	# get the right height before moving forward
+	if position_target.get_global_transform().get_origin().y - WALK_SPEED > get_global_transform().get_origin().y:
 		velocity.y = WALK_SPEED
-	elif target.get_global_transform().get_origin().y + WALK_SPEED < get_global_transform().get_origin().y:
+	elif position_target.get_global_transform().get_origin().y + WALK_SPEED < get_global_transform().get_origin().y:
 		velocity.y =  -WALK_SPEED
 	else:
 		velocity.y = 0
+		if position_target.get_global_transform().get_origin().x + WALK_SPEED < self.get_global_transform().get_origin().x:
+			velocity.x = -WALK_SPEED
+		elif position_target.get_global_transform().get_origin().x - WALK_SPEED > self.get_global_transform().get_origin().x:
+			velocity.x =  WALK_SPEED
+		else:
+			velocity.x = 0
 	
 	move_and_collide(velocity)
 
 func hit(damage):
-	life = max(0, life - damage)
+	life = min(max(0, life - damage), 100)
 	if life <= 0:
 		$AnimatedSprite.animation = \"dead\"
 		die()
@@ -74,41 +64,29 @@ func die():
 	get_parent().add_child(fire_explosion)
 	queue_free()
 
-func get_nearest_node_in_group(group_name):
-	var nodes = get_tree().get_nodes_in_group(group_name)
-	if nodes.size() == 0:
-		return null
-		
-	var nearest_node
-
-	# look through spawn nodes to see if any are closer
-	for node in nodes:
-		if node.life < 0:
-			continue
-		if nearest_node == null:
-			nearest_node = node
-		if node.global_position.distance_to(global_position) < nearest_node.global_position.distance_to(global_position):
-			nearest_node = node
-	return nearest_node
-
-func _on_Area2D_body_entered(body):
-	if body.is_in_group(\"player\"):
-		target = null
-		is_attacking = true
-
 func _on_AttackTimer_timeout():
-	var bodies = $Area2D.get_overlapping_bodies()
-	var hit_enemy = false
-	for body in bodies:
-			if body.is_in_group(\"player\"):
-				body.hit(damage)
-				hit_enemy = true
-				target = null
-				is_attacking = true
-	if !hit_enemy:
-		target = get_nearest_node_in_group(\"player\")
-		is_attacking = false
-		$AnimatedSprite.animation = \"idle\"
+	$AnimationPlayer.play(\"action\")
+
+func get_random_alive_target(group_name):
+	var nodes = get_tree().get_nodes_in_group(group_name)
+	var target_array = []
+
+	# look through spawn nodes to see if any are alive
+	for node in nodes:
+		if node.life > 0:
+			target_array.append(node)
+	
+	if target_array.size() == 0:
+		return null
+	
+	return target_array[randi() % target_array.size()]
+
+
+func _on_AnimationPlayer_animation_finished(anim_name):
+	if anim_name == \"action\":
+		var aim = get_random_alive_target(\"player\")
+		aim.hit(damage)
+	
 "
 
 [sub_resource type="AtlasTexture" id=13]
@@ -161,23 +139,65 @@ animations = [ {
 [sub_resource type="RectangleShape2D" id=18]
 extents = Vector2( 10.459, 30.311 )
 
-[sub_resource type="RectangleShape2D" id=19]
-extents = Vector2( 10.5568, 24.8787 )
+[sub_resource type="Animation" id=19]
+resource_name = "action"
+tracks/0/type = "bezier"
+tracks/0/path = NodePath("AnimatedSprite:offset:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"points": PoolRealArray( 0, -0.25, 0, 0.25, 0, 10, -0.25, 0, 0.25, 0, 8, -0.25, 0, 0.25, 0, 10, -0.25, 0, 0.25, 0, 8, -0.25, 0, 0.25, 0, 10, -0.25, 0, 0.25, 0, 8, -0.25, 0, 0.25, 0, 0, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1 )
+}
+tracks/1/type = "bezier"
+tracks/1/path = NodePath("AnimatedSprite:offset:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"points": PoolRealArray(  ),
+"times": PoolRealArray(  )
+}
+tracks/2/type = "bezier"
+tracks/2/path = NodePath("AnimatedSprite:rotation_degrees")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"points": PoolRealArray( 0, -0.25, 0, 0.25, 0, 6.80602, -0.3, -0.729189, 0.25, 0, 9.87591, -0.45, -3.17052, 0.25, 0, 0, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 0.5, 0.7, 1 )
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("AnimatedSprite:animation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 0.5, 0.9 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 1,
+"values": [ "running", "attacking", "running" ]
+}
 
 [node name="demon" type="KinematicBody2D" groups=[
 "monster",
 ]]
-position = Vector2( 601.041, 349.311 )
+position = Vector2( 0, 349.311 )
+scale = Vector2( -1, 1 )
 collision_layer = 4
-collision_mask = 3
+collision_mask = 0
 script = SubResource( 12 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 scale = Vector2( 5, 5 )
 frames = SubResource( 17 )
-animation = "idle"
+animation = "running"
 playing = true
-flip_h = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( -1.5, 4.5 )
@@ -196,14 +216,13 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Area2D" type="Area2D" parent="."]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-position = Vector2( -24.2921, 4.01123 )
-shape = SubResource( 19 )
-
 [node name="AttackTimer" type="Timer" parent="."]
-wait_time = 0.4
+wait_time = 2.5
 
-[connection signal="body_entered" from="Area2D" to="." method="_on_Area2D_body_entered"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/action = SubResource( 19 )
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+
 [connection signal="timeout" from="AttackTimer" to="." method="_on_AttackTimer_timeout"]
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]
