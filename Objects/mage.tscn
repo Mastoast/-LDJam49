@@ -1,10 +1,13 @@
-[gd_scene load_steps=20 format=2]
+[gd_scene load_steps=23 format=2]
 
 [ext_resource path="res://Sprites/mage.png" type="Texture" id=1]
 [ext_resource path="res://Sprites/healthSprite.png" type="Texture" id=2]
 [ext_resource path="res://Scripts/mage.gd" type="Script" id=3]
 [ext_resource path="res://Shaders/flash_shader.tres" type="Material" id=4]
 [ext_resource path="res://Fonts/Retro Gaming.ttf" type="DynamicFontData" id=5]
+[ext_resource path="res://sound/Explosion8.wav" type="AudioStream" id=6]
+[ext_resource path="res://sound/Laser_Shoot2.wav" type="AudioStream" id=7]
+[ext_resource path="res://sound/Death1.wav" type="AudioStream" id=8]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 1 )
@@ -112,6 +115,20 @@ tracks/3/keys = {
 "update": 1,
 "values": [ "running", "attacking", "running" ]
 }
+tracks/4/type = "audio"
+tracks/4/path = NodePath("AttackAudio")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"clips": [ {
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource( 7 )
+} ],
+"times": PoolRealArray( 0.5 )
+}
 
 [sub_resource type="Animation" id=13]
 resource_name = "hit"
@@ -143,7 +160,6 @@ material = ExtResource( 4 )
 scale = Vector2( 5, 5 )
 frames = SubResource( 10 )
 animation = "running"
-frame = 2
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -172,9 +188,6 @@ autostart = true
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/action = SubResource( 12 )
 
-[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
-bus = "InGame"
-
 [node name="ShaderAnimationPlayer" type="AnimationPlayer" parent="."]
 anims/hit = SubResource( 13 )
 
@@ -196,6 +209,19 @@ __meta__ = {
 [node name="TextTimer" type="Timer" parent="text"]
 wait_time = 2.0
 one_shot = true
+
+[node name="AttackAudio" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource( 6 )
+volume_db = -28.167
+attenuation = 0.0
+bus = "InGame"
+
+[node name="DeathAudio" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource( 8 )
+volume_db = -28.167
+pitch_scale = 0.81
+attenuation = 0.0
+bus = "InGame"
 
 [connection signal="timeout" from="AttackTimer" to="." method="_on_AttackTimer_timeout"]
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]

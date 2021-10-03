@@ -8,8 +8,7 @@ func _ready():
 	._ready()
 
 func _process(delta):
-	if Input.is_action_just_pressed("ui_accept"):
-		pass
+	pass
 
 func shoot():
 	emit_signal("spawn_text", "BOOM !", self.position, self.color)

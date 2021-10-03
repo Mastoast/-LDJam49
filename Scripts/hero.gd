@@ -16,6 +16,11 @@ func _ready():
 func _process(delta):
 	# UI
 	$HealthBar.value = life
+	
+	if Global.boss_defeated:
+		$AnimatedSprite.animation = "idle"
+		$ShaderAnimationPlayer.stop()
+		$AttackTimer.stop()
 
 func hit(damage):
 	life = max(0, life - damage)
@@ -40,11 +45,15 @@ func resurrect(damage):
 		life = damage
 		$AnimatedSprite.animation = "running"
 		$AttackTimer.stop()
+		Global.player_alive += 1
 	speak(rez_texts[randi()%rez_texts.size()])
 
 func die():
+	Global.player_alive -= 1
 	$AnimatedSprite.animation = "dead"
+	$AnimationPlayer.stop()
 	$AttackTimer.stop()
+	$DeathAudio.play()
 
 func speak(text : String):
 	$text.text = text
@@ -70,6 +79,7 @@ func get_random_alive_target(group_name):
 	return target_array[randi() % target_array.size()]
 
 func _on_AttackTimer_timeout():
+	$AttackAudio.pitch_scale = rand_range(0.85, 1.15)
 	$AnimationPlayer.play("action")
 
 func _on_AnimationPlayer_animation_finished(anim_name):

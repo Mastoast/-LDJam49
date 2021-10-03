@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=2]
+[gd_scene load_steps=21 format=2]
 
 [ext_resource path="res://Objects/healer.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Objects/warrior.tscn" type="PackedScene" id=2]
@@ -26,8 +26,27 @@ func _ready():
 	pass
 
 func _process(delta):
+	if !Global.is_connected:
+		AudioServer.set_bus_mute(AudioServer.get_bus_index(\"InGame\"), true)
+	else:
+		AudioServer.set_bus_mute(AudioServer.get_bus_index(\"InGame\"), false)
+	
+	# Tuto
+	$CommandText.visible = Global.spell_count >= 1
+	$SpellsText.visible = Global.spell_count >= 2
 	# Handle spawns
 	var demons = get_tree().get_nodes_in_group(\"monster\")
+	if Global.boss_defeated:
+		$NewFightLabel.visible = false
+		$SpellsText.visible = false
+		$CommandText.visible = false
+		$WinScreen.visible = true
+		return
+	if Global.player_alive <= 0:
+		$GameOverScreen.visible = true
+		if Input.is_key_pressed(KEY_ENTER):
+			get_tree().reload_current_scene()
+		
 	if demons.size() == 0:
 		if wave_incoming:
 			if $NewFightLabel.percent_visible < 1.0:
@@ -41,11 +60,17 @@ func _process(delta):
 						spawn(demon_node, spawn_points[spawn_points.size() % (i+1)].position)
 				if difficulty_index == 4:
 					spawn(demon_lord_node, spawn_points[0].position)
+					spawn(demon_node, spawn_points[3].position)
+					spawn(demon_node, spawn_points[4].position)
 		else:
 			difficulty_index += 1
 			$NewFightLabel.visible = true
 			$NewFightLabel.percent_visible = 0.47
 			wave_incoming = true
+			get_tree().get_nodes_in_group(\"warrior\")[0].resurrect(10)
+			get_tree().get_nodes_in_group(\"rogue\")[0].resurrect(10)
+			get_tree().get_nodes_in_group(\"mage\")[0].resurrect(10)
+			get_tree().get_nodes_in_group(\"healer\")[0].resurrect(10)
 
 func spawn(node, position):
 	var new = node.instance()
@@ -147,6 +172,15 @@ size = 18
 extra_spacing_space = 2
 font_data = ExtResource( 6 )
 
+[sub_resource type="DynamicFont" id=18]
+extra_spacing_space = 2
+font_data = ExtResource( 6 )
+
+[sub_resource type="DynamicFont" id=19]
+size = 28
+extra_spacing_space = 2
+font_data = ExtResource( 6 )
+
 [node name="MMO" type="Node2D"]
 z_index = 5
 script = SubResource( 1 )
@@ -181,7 +215,7 @@ region_enabled = true
 region_rect = Rect2( 16, 0, 16, 16 )
 
 [node name="Sprite8" type="Sprite" parent="background"]
-position = Vector2( 123.336, 201.573 )
+position = Vector2( 81.2912, 295.753 )
 scale = Vector2( 5, 5 )
 texture = ExtResource( 8 )
 region_enabled = true
@@ -382,10 +416,61 @@ margin_top = 17.252
 margin_right = 656.888
 margin_bottom = 78.252
 custom_fonts/normal_font = SubResource( 17 )
-visible_characters = 19
+visible_characters = 0
 percent_visible = 0.47
 text = "NEW FIGHT INCOMING
 [=====================]"
+scroll_active = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SpellsText" type="RichTextLabel" parent="."]
+margin_left = 7.89087
+margin_top = 569.454
+margin_right = 1012.89
+margin_bottom = 609.454
+custom_fonts/normal_font = SubResource( 18 )
+text = "known spells : [SUPPORT], [FOUNTAIN], [RESURRECT], [HEAL], [QPAWXCMLKERTSD]"
+scroll_active = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CommandText" type="RichTextLabel" parent="."]
+visible = false
+margin_left = 6.28925
+margin_top = 543.352
+margin_right = 528.289
+margin_bottom = 583.352
+custom_fonts/normal_font = SubResource( 18 )
+text = "[SPACE] + []/[F1]/[F2]/[F3] + spell"
+scroll_active = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="WinScreen" type="RichTextLabel" parent="."]
+visible = false
+margin_left = 176.005
+margin_top = 522.299
+margin_right = 912.005
+margin_bottom = 562.299
+custom_fonts/normal_font = SubResource( 19 )
+text = "Boss defeated, thank you for playing !"
+scroll_active = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="GameOverScreen" type="RichTextLabel" parent="."]
+visible = false
+margin_left = 181.045
+margin_top = 466.864
+margin_right = 917.045
+margin_bottom = 579.864
+custom_fonts/normal_font = SubResource( 19 )
+text = "Your group has been defeated, but you can blame the connection for it.     Press [Enter] to restart"
 scroll_active = false
 __meta__ = {
 "_edit_use_anchors_": false
