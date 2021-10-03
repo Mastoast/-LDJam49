@@ -30,7 +30,6 @@ func hit(damage):
 	$ShaderAnimationPlayer.play("hit")
 	if randi()%100 < 15:
 		var text = hit_texts[randi()%hit_texts.size()]
-		print_debug(text)
 		speak(text)
 
 func heal(damage):

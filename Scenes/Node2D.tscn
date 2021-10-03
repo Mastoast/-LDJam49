@@ -1,0 +1,91 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://Objects/healer.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Objects/rogue.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Objects/mage.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Objects/warrior.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Sprites/environement.png" type="Texture" id=5]
+
+[sub_resource type="Gradient" id=1]
+colors = PoolColorArray( 0.0393066, 0.359375, 0.0668125, 1, 0.308594, 0.254349, 0.254349, 1 )
+
+[sub_resource type="GradientTexture" id=2]
+gradient = SubResource( 1 )
+
+[node name="Node2D" type="Node2D"]
+
+[node name="warrior" parent="." instance=ExtResource( 4 )]
+position = Vector2( 243.78, 184.862 )
+
+[node name="rogue" parent="." instance=ExtResource( 2 )]
+position = Vector2( 262.052, 338.409 )
+scale = Vector2( -1, 1 )
+
+[node name="mage" parent="." instance=ExtResource( 3 )]
+position = Vector2( 327.364, 278.75 )
+scale = Vector2( -1, 1 )
+
+[node name="healer" parent="." instance=ExtResource( 1 )]
+position = Vector2( 172.492, 275.403 )
+
+[node name="environement" type="Sprite" parent="."]
+position = Vector2( 131.213, 486.757 )
+scale = Vector2( 5, 5 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 0, 0, 16, 16 )
+
+[node name="environement2" type="Sprite" parent="."]
+position = Vector2( 604.944, 441.4 )
+scale = Vector2( 5, 5 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 0, 0, 16, 16 )
+
+[node name="environement3" type="Sprite" parent="."]
+position = Vector2( 352.959, 126.42 )
+scale = Vector2( 5, 5 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 0, 0, 16, 16 )
+
+[node name="environement4" type="Sprite" parent="."]
+position = Vector2( 106.015, 159.178 )
+scale = Vector2( 5, 5 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 0, 0, 16, 16 )
+
+[node name="environement5" type="Sprite" parent="."]
+position = Vector2( 75.7769, 373.364 )
+scale = Vector2( 5, 5 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 0, 0, 16, 16 )
+
+[node name="environement6" type="Sprite" parent="."]
+position = Vector2( 74.5169, 282.65 )
+scale = Vector2( 5, 5 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 0, 0, 16, 16 )
+
+[node name="environement7" type="Sprite" parent="."]
+position = Vector2( 155.152, 383.444 )
+scale = Vector2( 5, 5 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 0, 0, 16, 16 )
+
+[node name="environement8" type="Sprite" parent="."]
+position = Vector2( 441.154, 198.236 )
+scale = Vector2( 5, 5 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 0, 0, 16, 16 )
+
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( 432.773, 351.702 )
+scale = Vector2( 0.457156, 882.294 )
+z_index = -15
+texture = SubResource( 2 )

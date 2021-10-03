@@ -22,7 +22,7 @@ var required_keys = []
 func _ready():
 	$desktop/WindowDialog.popup_centered()
 	$desktop/WindowDialog.get_close_button().hide()
-	$UpdateOSWindow.get_close_button().hide()
+	$Sprite/UpdateOSWindow.get_close_button().hide()
 	Global.spell_count = 0
 	Global.player_alive = 4
 	Global.is_connected = true
@@ -53,9 +53,10 @@ func _process(delta):
 	$desktop/WindowDialog/MMO.visible = Global.is_connected
 	$desktop/WindowDialog/DisconnectedScreen.visible = !Global.is_connected
 	
-	if $UpdateOSWindow.visible and Input.is_key_pressed(KEY_CONTROL) and Input.is_key_pressed(KEY_H):
-		$UpdateOSWindow.visible = false
-		$AnimationPlayer.play_backwards(\"Zoom\")
+	if $Sprite/UpdateOSWindow.visible and Input.is_key_pressed(KEY_CONTROL) and Input.is_key_pressed(KEY_H):
+		$Sprite/UpdateOSWindow.visible = false
+		if Global.is_connected:
+			$AnimationPlayer.play_backwards(\"Zoom\")
 	
 	 # Print text in box
 	if $ColorRect/ColorRect2/RichTextLabel.visible_characters < $ColorRect/ColorRect2/RichTextLabel.text.length():
@@ -82,9 +83,9 @@ func show_text(text : String):
 
 
 func _on_EventTimer_timeout():
-	if !$UpdateOSWindow.visible:
+	if !$Sprite/UpdateOSWindow.visible:
 		$AnimationPlayer.play(\"Zoom\")
-		$UpdateOSWindow.visible = true
+		$Sprite/UpdateOSWindow.visible = true
 		$EventTimer.start(rand_range(18.0, 20))
 "
 
@@ -293,7 +294,10 @@ position = Vector2( 982.992, 579.956 )
 scale = Vector2( 2, 2 )
 texture = ExtResource( 4 )
 
-[node name="UpdateOSWindow" type="WindowDialog" parent="."]
+[node name="Sprite" type="CanvasLayer" parent="."]
+follow_viewport_enable = true
+
+[node name="UpdateOSWindow" type="WindowDialog" parent="Sprite"]
 visible = true
 margin_left = 314.0
 margin_top = 231.0
@@ -304,7 +308,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="RichTextLabel" type="RichTextLabel" parent="UpdateOSWindow"]
+[node name="RichTextLabel" type="RichTextLabel" parent="Sprite/UpdateOSWindow"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 32.0
@@ -317,14 +321,14 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Button" type="Button" parent="UpdateOSWindow"]
+[node name="Button" type="Button" parent="Sprite/UpdateOSWindow"]
 margin_left = 126.714
 margin_top = 226.633
 margin_right = 208.714
 margin_bottom = 262.633
 text = "Yes"
 
-[node name="Button2" type="Button" parent="UpdateOSWindow"]
+[node name="Button2" type="Button" parent="Sprite/UpdateOSWindow"]
 margin_left = 350.084
 margin_top = 228.878
 margin_right = 432.084
