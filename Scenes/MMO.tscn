@@ -12,10 +12,11 @@
 script/source = "extends Node2D
 signal spawn_text
 
-var is_connected = true
+var wave_incoming = false
 var difficulty_index = 0
 
 var demon_node = preload(\"res://Objects/demon.tscn\")
+var demon_lord_node = preload(\"res://Objects/demon_lord.tscn\")
 onready var spawn_points = [$SpawnPosition, $SpawnPosition2, $SpawnPosition3, $SpawnPosition4, $SpawnPosition5]
 
 
@@ -24,41 +25,25 @@ func _ready():
 	pass#open_popup()
 
 func _process(delta):
-	# check connection
-	if !is_connected and !$Popup.visible:
-		open_popup()
-
 	# Handle spawns
 	var demons = get_tree().get_nodes_in_group(\"monster\")
 	if demons.size() == 0:
-		difficulty_index += 1
-		for i in range(difficulty_index):
-			spawn(demon_node, spawn_points[spawn_points.size() % (i+1)].position)
+		if wave_incoming:
+			pass
+		else:
+			wave_incoming = true
+			difficulty_index += 1
+			if difficulty_index < 4:
+				for i in range(difficulty_index):
+					spawn(demon_node, spawn_points[spawn_points.size() % (i+1)].position)
+			if difficulty_index == 4:
+				spawn(demon_lord_node, spawn_points[0].position)
 
 func spawn(node, position):
 	var new = node.instance()
 	new.position = Vector2(position.x + rand_range(-50, 50), position.y + rand_range(-50, 50))
 	new.z_index = 500
-	print_debug(new.z_index, new.z_as_relative)
 	self.add_child(new)
-
-func set_connection(connection):
-	self.is_connected = connection
-
-func open_popup():
-	$Popup.visible = true
-	for node in get_children():
-		if node.has_method(\"pause\"):
-			node.pause()
-	# TODO play error sound
-
-func _on_Button_pressed():
-	$Popup.visible = false
-	for node in get_children():
-		if node.has_method(\"unpause\"):
-			node.unpause()
-	if !is_connected:
-		open_popup()
 "
 
 [sub_resource type="Gradient" id=2]
@@ -76,10 +61,6 @@ width = 40
 
 [sub_resource type="RectangleShape2D" id=6]
 extents = Vector2( 20.1526, 20.2968 )
-
-[sub_resource type="DynamicFont" id=9]
-extra_spacing_space = 2
-font_data = ExtResource( 5 )
 
 [sub_resource type="Animation" id=16]
 resource_name = "enter_cpu"
@@ -148,6 +129,10 @@ tracks/2/keys = {
 "points": PoolRealArray( 0, -0.25, 0, 0.25, 0, 0.5, -0.25, 0, 0.25, 0 ),
 "times": PoolRealArray( 0, 2 )
 }
+
+[sub_resource type="DynamicFont" id=9]
+extra_spacing_space = 2
+font_data = ExtResource( 5 )
 
 [node name="MMO" type="Node2D"]
 z_index = 5
@@ -290,69 +275,6 @@ position = Vector2( 727.593, 340.517 )
 [node name="SpawnPosition5" type="Position2D" parent="."]
 position = Vector2( 731.388, 256.432 )
 
-[node name="Popup" type="Popup" parent="."]
-pause_mode = 2
-margin_left = 316.923
-margin_top = 245.155
-margin_right = 704.923
-margin_bottom = 366.155
-popup_exclusive = true
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Panel" type="Panel" parent="Popup"]
-show_behind_parent = true
-anchor_right = 1.0
-anchor_bottom = 1.0
-
-[node name="ColorRect" type="ColorRect" parent="Popup/Panel"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_right = 3.05176e-05
-margin_bottom = -101.0
-color = Color( 0.607843, 0.607843, 0.607843, 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="RichTextLabel" type="RichTextLabel" parent="Popup/Panel/ColorRect"]
-use_parent_material = true
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 136.341
-margin_right = -127.659
-custom_fonts/normal_font = SubResource( 9 )
-text = "Disconnected !"
-scroll_active = false
-
-[node name="RichTextLabel" type="RichTextLabel" parent="Popup/Panel"]
-use_parent_material = true
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 10.0
-margin_top = 22.0
-margin_right = -10.0
-custom_fonts/normal_font = SubResource( 9 )
-text = "Please check your internet connnection and try again
-(Error Code: 666)"
-scroll_active = false
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Button" type="Button" parent="Popup/Panel"]
-use_parent_material = true
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-margin_left = -20.0
-margin_top = -31.3461
-margin_right = 19.0
-margin_bottom = -11.3461
-text = "Retry"
-
 [node name="ColorRect" type="ColorRect" parent="."]
 self_modulate = Color( 1, 1, 1, 0 )
 material = ExtResource( 7 )
@@ -368,5 +290,73 @@ __meta__ = {
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/enter_cpu = SubResource( 16 )
 anims/exit_cpu = SubResource( 15 )
+
+[node name="Popup" type="Popup" parent="."]
+pause_mode = 2
+margin_left = 812.694
+margin_top = 352.551
+margin_right = 1200.69
+margin_bottom = 473.551
+popup_exclusive = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel" type="Panel" parent="Popup"]
+show_behind_parent = true
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -147.0
+margin_top = -87.0
+margin_right = 3.05176e-05
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="Popup/Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_bottom = -180.0
+color = Color( 0.607843, 0.607843, 0.607843, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Popup/Panel/ColorRect"]
+use_parent_material = true
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 206.0
+margin_right = -206.0
+custom_fonts/normal_font = SubResource( 9 )
+text = "Disconnected !"
+scroll_active = false
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Popup/Panel"]
+use_parent_material = true
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 7.0
+margin_top = 32.0
+margin_right = -10.0
+custom_fonts/normal_font = SubResource( 9 )
+text = "Please check your internet connnection and try again
+(Error Code: 666)"
+scroll_active = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Button" type="Button" parent="Popup/Panel"]
+use_parent_material = true
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+margin_left = -33.5
+margin_top = -37.0
+margin_right = 33.5
+margin_bottom = -11.0
+text = "Retry"
 
 [connection signal="pressed" from="Popup/Panel/Button" to="." method="_on_Button_pressed"]

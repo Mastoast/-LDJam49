@@ -75,7 +75,8 @@ func _on_AttackTimer_timeout():
 func _on_AnimationPlayer_animation_finished(anim_name):
 	if anim_name == "action":
 		var aim = get_random_alive_target("monster")
-		aim.hit(damage)
+		if aim != null:
+			aim.hit(damage)
 
 func _on_TextTimer_timeout():
 	$text.text = ""

@@ -2,7 +2,7 @@ extends "res://Scripts/hero.gd"
 
 func _ready():
 	color = Color.black
-	damage = 5
+	damage = 25
 	._ready()
 
 

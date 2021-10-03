@@ -12,11 +12,11 @@ const WALK_SPEED = 5
 
 var fire_explosion = preload(\"res://Objects/fire_explosion.tscn\")
 
-var life = 100
+var life = 250
 var color = Color.red
-var damage = 5
+var damage = 20
 
-var hit_texts = [\"I am a demon\", \"I am so evil\", \"hahahaha\"]
+var hit_texts = [\"I am a demon lord\", \"I am taller than the others\", \"*Insert evil punchline here*\"]
 
 func _ready():
 	connect(\"spawn_text\", self.get_parent(), \"create_label\")
@@ -81,7 +81,6 @@ func _on_AnimationPlayer_animation_finished(anim_name):
 
 func _on_TextTimer_timeout():
 	$text.text = \"\"
-
 "
 
 [sub_resource type="AtlasTexture" id=2]
@@ -196,9 +195,10 @@ tracks/0/keys = {
 [sub_resource type="DynamicFont" id=12]
 font_data = ExtResource( 4 )
 
-[node name="demon" type="KinematicBody2D" groups=[
+[node name="demon_lord" type="KinematicBody2D" groups=[
 "monster",
 ]]
+scale = Vector2( 2, 2 )
 collision_layer = 4
 collision_mask = 0
 script = SubResource( 1 )
@@ -208,6 +208,7 @@ material = ExtResource( 3 )
 scale = Vector2( 5, 5 )
 frames = SubResource( 8 )
 animation = "running"
+frame = 1
 playing = true
 flip_h = true
 
@@ -221,7 +222,8 @@ margin_top = -48.0
 margin_right = -5.0
 margin_bottom = -44.0
 rect_scale = Vector2( 2, 2 )
-value = 100.0
+max_value = 250.0
+value = 250.0
 texture_progress = ExtResource( 1 )
 tint_progress = Color( 0.788235, 0.0156863, 0.0156863, 1 )
 __meta__ = {

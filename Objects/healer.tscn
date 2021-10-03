@@ -71,10 +71,10 @@ func _process(delta):
 			current_spell = \"\"
 
 func handle_tutorial_text(heal_target):
-	if spell_count > 1:
+	if Global.spell_count > 1:
 		$tutorial_text.text = \"\"
 		return
-	if spell_count == 0:
+	if Global.spell_count == 0:
 		if !$target.visible:
 			$tutorial_text.text = tuto[0]
 		elif heal_target == self:
@@ -83,7 +83,7 @@ func handle_tutorial_text(heal_target):
 			$tutorial_text.text = tuto[2]
 		else:
 			$tutorial_text.text = tuto[3]
-	if spell_count == 1:
+	if Global.spell_count == 1:
 		if !$target.visible:
 			$tutorial_text.text = tuto[4]
 		elif heal_target == self:
@@ -119,7 +119,7 @@ func cast(spell : String, target : Object):
 			spawn_particles(node.position)
 		# TODO sound
 	
-	spell_count += 1
+	Global.spell_count += 1
 
 func hit(damage):
 	life = max(0, life - damage)
