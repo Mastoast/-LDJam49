@@ -4,6 +4,7 @@ var fireball = preload("res://Objects/Fireball.tscn")
 
 func _ready():
 	color = Color.lightskyblue
+	damage = 15
 
 func _process(delta):
 	if Input.is_action_just_pressed("ui_accept"):

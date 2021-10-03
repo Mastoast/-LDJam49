@@ -1,10 +1,13 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://Objects/healer.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Objects/warrior.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Objects/rogue.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Objects/mage.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Fonts/ARCADECLASSIC.TTF" type="DynamicFontData" id=5]
 [ext_resource path="res://Sprites/environement.png" type="Texture" id=8]
 
-[sub_resource type="GDScript" id=19]
+[sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
 signal spawn_text
 
@@ -60,28 +63,28 @@ func _on_ErrorTimer_timeout():
 		open_popup()
 "
 
-[sub_resource type="Gradient" id=20]
+[sub_resource type="Gradient" id=2]
 colors = PoolColorArray( 0.402679, 0.566406, 0.466635, 1, 0.320923, 0.933594, 0.431012, 0.231373 )
 
-[sub_resource type="GradientTexture" id=21]
-gradient = SubResource( 20 )
+[sub_resource type="GradientTexture" id=3]
+gradient = SubResource( 2 )
 width = 2
 
-[sub_resource type="Gradient" id=22]
+[sub_resource type="Gradient" id=4]
 
-[sub_resource type="GradientTexture" id=23]
-gradient = SubResource( 22 )
+[sub_resource type="GradientTexture" id=5]
+gradient = SubResource( 4 )
 width = 40
 
-[sub_resource type="RectangleShape2D" id=24]
+[sub_resource type="RectangleShape2D" id=6]
 extents = Vector2( 20.1526, 20.2968 )
 
-[sub_resource type="DynamicFont" id=18]
+[sub_resource type="DynamicFont" id=7]
 size = 24
 extra_spacing_space = 2
 font_data = ExtResource( 5 )
 
-[sub_resource type="GDScript" id=25]
+[sub_resource type="GDScript" id=8]
 script/source = "extends RichTextLabel
 
 func _ready():
@@ -95,19 +98,19 @@ func _on_Timer_timeout():
 	queue_free()
 "
 
-[sub_resource type="DynamicFont" id=26]
+[sub_resource type="DynamicFont" id=9]
 extra_spacing_space = 2
 font_data = ExtResource( 5 )
 
 [node name="MMO" type="Node2D"]
-script = SubResource( 19 )
+script = SubResource( 1 )
 
 [node name="background" type="Node2D" parent="."]
 
 [node name="Background" type="Sprite" parent="background"]
 position = Vector2( 512, 300 )
 scale = Vector2( 512, 594.318 )
-texture = SubResource( 21 )
+texture = SubResource( 3 )
 
 [node name="Sprite" type="Sprite" parent="background"]
 position = Vector2( 179.988, 475.784 )
@@ -167,10 +170,10 @@ scale = Vector2( 1, 15.4 )
 
 [node name="Sprite" type="Sprite" parent="Wall"]
 scale = Vector2( 1, 40 )
-texture = SubResource( 23 )
+texture = SubResource( 5 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Wall"]
-shape = SubResource( 24 )
+shape = SubResource( 6 )
 
 [node name="Wall2" type="StaticBody2D" parent="."]
 position = Vector2( 1044.48, 272.308 )
@@ -178,10 +181,10 @@ scale = Vector2( -0.923225, -18.1661 )
 
 [node name="Sprite" type="Sprite" parent="Wall2"]
 scale = Vector2( 1, 40 )
-texture = SubResource( 23 )
+texture = SubResource( 5 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Wall2"]
-shape = SubResource( 24 )
+shape = SubResource( 6 )
 
 [node name="Wall3" type="StaticBody2D" parent="."]
 position = Vector2( 507.704, -20.2805 )
@@ -190,10 +193,10 @@ scale = Vector2( 1.05352, 26.011 )
 
 [node name="Sprite" type="Sprite" parent="Wall3"]
 scale = Vector2( 1, 40 )
-texture = SubResource( 23 )
+texture = SubResource( 5 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Wall3"]
-shape = SubResource( 24 )
+shape = SubResource( 6 )
 
 [node name="Wall4" type="StaticBody2D" parent="."]
 position = Vector2( 509.599, 622.356 )
@@ -202,10 +205,10 @@ scale = Vector2( 1.01167, 26.3355 )
 
 [node name="Sprite" type="Sprite" parent="Wall4"]
 scale = Vector2( 1, 40 )
-texture = SubResource( 23 )
+texture = SubResource( 5 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Wall4"]
-shape = SubResource( 24 )
+shape = SubResource( 6 )
 
 [node name="TextLabel" type="RichTextLabel" parent="."]
 anchor_left = 0.5
@@ -214,10 +217,10 @@ margin_left = -211.0
 margin_top = -82.0
 margin_right = 211.0
 margin_bottom = -46.0
-custom_fonts/normal_font = SubResource( 18 )
+custom_fonts/normal_font = SubResource( 7 )
 fit_content_height = true
 scroll_active = false
-script = SubResource( 25 )
+script = SubResource( 8 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -259,7 +262,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 136.341
 margin_right = -127.659
-custom_fonts/normal_font = SubResource( 26 )
+custom_fonts/normal_font = SubResource( 9 )
 text = "Disconnected !"
 scroll_active = false
 
@@ -269,7 +272,7 @@ anchor_bottom = 1.0
 margin_left = 10.0
 margin_top = 22.0
 margin_right = -10.0
-custom_fonts/normal_font = SubResource( 26 )
+custom_fonts/normal_font = SubResource( 9 )
 text = "Please check your internet connnection and try again
 (Error Code: 666)"
 scroll_active = false
@@ -306,17 +309,14 @@ position = Vector2( 727.593, 340.517 )
 [node name="SpawnPosition5" type="Position2D" parent="."]
 position = Vector2( 731.388, 256.432 )
 
-[node name="PlayerPosition1" type="Position2D" parent="."]
-position = Vector2( 425.413, 298.575 )
+[node name="rogue" parent="." instance=ExtResource( 3 )]
+position = Vector2( 374.281, 251.079 )
 
-[node name="PlayerPosition2" type="Position2D" parent="."]
-position = Vector2( 372.657, 251.432 )
+[node name="warrior" parent="rogue" instance=ExtResource( 2 )]
+position = Vector2( 53.8782, 43.776 )
 
-[node name="PlayerPosition3" type="Position2D" parent="."]
-position = Vector2( 360.31, 354.698 )
-
-[node name="PlayerPosition4" type="Position2D" parent="."]
-position = Vector2( 255.921, 313.167 )
+[node name="mage" parent="rogue" instance=ExtResource( 4 )]
+position = Vector2( -15.7144, 141.43 )
 
 [connection signal="timeout" from="TextLabel/Timer" to="TextLabel" method="_on_Timer_timeout"]
 [connection signal="pressed" from="Popup/Panel/Button" to="." method="_on_Button_pressed"]

@@ -1,6 +1,7 @@
 extends "res://Scripts/hero.gd"
 
 func _ready():
+	damage = 8
 	color = Color.lightcoral
 
 

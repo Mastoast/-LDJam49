@@ -3,54 +3,30 @@
 [ext_resource path="res://Sprites/healthSpriteRed.png" type="Texture" id=1]
 [ext_resource path="res://Sprites/demon_1.png" type="Texture" id=2]
 
-[sub_resource type="GDScript" id=12]
+[sub_resource type="GDScript" id=1]
 script/source = "extends KinematicBody2D
 
 const WALK_SPEED = 5
+signal spawn_text(text, position, color)
 
-var fire_explosion = preload(\"res://Objects/fire_explosion.tscn\").instance()
+var fire_explosion = preload(\"res://Objects/fire_explosion.tscn\")
 
 var life = 100
-var velocity = Vector2()
 var color = Color.red
 var damage = 2
-var position_target
 
 func _ready():
+	connect(\"spawn_text\", self.get_parent(), \"create_label\")
 	$AttackTimer.paused = false
 	$AttackTimer.start()
+	# particles
+	var born_fire = fire_explosion.instance()
+	born_fire.position = self.position
+	get_parent().add_child(born_fire)
 
 func _process(delta):
 	# UI
 	$HealthBar.value = life
-	
-	if life <= 0:
-		return
-
-	if velocity.x > 0:
-		self.scale.x = 1
-	elif velocity.x < 0:
-		self.scale.x = -1
-
-func _physics_process(delta):
-	if !is_instance_valid(position_target):
-		return
-
-	# get the right height before moving forward
-	if position_target.get_global_transform().get_origin().y - WALK_SPEED > get_global_transform().get_origin().y:
-		velocity.y = WALK_SPEED
-	elif position_target.get_global_transform().get_origin().y + WALK_SPEED < get_global_transform().get_origin().y:
-		velocity.y =  -WALK_SPEED
-	else:
-		velocity.y = 0
-		if position_target.get_global_transform().get_origin().x + WALK_SPEED < self.get_global_transform().get_origin().x:
-			velocity.x = -WALK_SPEED
-		elif position_target.get_global_transform().get_origin().x - WALK_SPEED > self.get_global_transform().get_origin().x:
-			velocity.x =  WALK_SPEED
-		else:
-			velocity.x = 0
-	
-	move_and_collide(velocity)
 
 func hit(damage):
 	life = min(max(0, life - damage), 100)
@@ -60,12 +36,10 @@ func hit(damage):
 		return true
 
 func die():
-	fire_explosion.position = self.position
-	get_parent().add_child(fire_explosion)
+	var death_fire = fire_explosion.instance()
+	death_fire.position = self.position
+	get_parent().add_child(death_fire)
 	queue_free()
-
-func _on_AttackTimer_timeout():
-	$AnimationPlayer.play(\"action\")
 
 func get_random_alive_target(group_name):
 	var nodes = get_tree().get_nodes_in_group(group_name)
@@ -81,6 +55,8 @@ func get_random_alive_target(group_name):
 	
 	return target_array[randi() % target_array.size()]
 
+func _on_AttackTimer_timeout():
+	$AnimationPlayer.play(\"action\")
 
 func _on_AnimationPlayer_animation_finished(anim_name):
 	if anim_name == \"action\":
@@ -89,57 +65,57 @@ func _on_AnimationPlayer_animation_finished(anim_name):
 	
 "
 
-[sub_resource type="AtlasTexture" id=13]
+[sub_resource type="AtlasTexture" id=2]
 atlas = ExtResource( 2 )
 region = Rect2( 0, 0, 16, 16 )
 
-[sub_resource type="AtlasTexture" id=10]
+[sub_resource type="AtlasTexture" id=3]
 atlas = ExtResource( 2 )
 region = Rect2( 0, 0, 16, 16 )
 
-[sub_resource type="AtlasTexture" id=11]
+[sub_resource type="AtlasTexture" id=4]
 atlas = ExtResource( 2 )
 region = Rect2( 16, 0, 16, 16 )
 
-[sub_resource type="AtlasTexture" id=14]
+[sub_resource type="AtlasTexture" id=5]
 atlas = ExtResource( 2 )
 region = Rect2( 48, 0, 16, 16 )
 
-[sub_resource type="AtlasTexture" id=15]
+[sub_resource type="AtlasTexture" id=6]
 atlas = ExtResource( 2 )
 region = Rect2( 0, 0, 16, 16 )
 
-[sub_resource type="AtlasTexture" id=16]
+[sub_resource type="AtlasTexture" id=7]
 atlas = ExtResource( 2 )
 region = Rect2( 32, 0, 16, 16 )
 
-[sub_resource type="SpriteFrames" id=17]
+[sub_resource type="SpriteFrames" id=8]
 animations = [ {
-"frames": [ SubResource( 13 ) ],
+"frames": [ SubResource( 2 ) ],
 "loop": true,
 "name": "idle",
 "speed": 5.0
 }, {
-"frames": [ SubResource( 10 ), SubResource( 11 ) ],
+"frames": [ SubResource( 3 ), SubResource( 4 ) ],
 "loop": true,
 "name": "running",
 "speed": 5.0
 }, {
-"frames": [ SubResource( 14 ) ],
+"frames": [ SubResource( 5 ) ],
 "loop": true,
 "name": "dead",
 "speed": 5.0
 }, {
-"frames": [ SubResource( 15 ), SubResource( 16 ) ],
+"frames": [ SubResource( 6 ), SubResource( 7 ) ],
 "loop": true,
 "name": "attacking",
 "speed": 5.0
 } ]
 
-[sub_resource type="RectangleShape2D" id=18]
+[sub_resource type="RectangleShape2D" id=9]
 extents = Vector2( 10.459, 30.311 )
 
-[sub_resource type="Animation" id=19]
+[sub_resource type="Animation" id=10]
 resource_name = "action"
 tracks/0/type = "bezier"
 tracks/0/path = NodePath("AnimatedSprite:offset:x")
@@ -191,17 +167,18 @@ position = Vector2( 0, 349.311 )
 scale = Vector2( -1, 1 )
 collision_layer = 4
 collision_mask = 0
-script = SubResource( 12 )
+script = SubResource( 1 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 scale = Vector2( 5, 5 )
-frames = SubResource( 17 )
+frames = SubResource( 8 )
 animation = "running"
+frame = 1
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( -1.5, 4.5 )
-shape = SubResource( 18 )
+shape = SubResource( 9 )
 
 [node name="HealthBar" type="TextureProgress" parent="."]
 margin_left = -19.0
@@ -220,9 +197,10 @@ __meta__ = {
 wait_time = 2.5
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-anims/action = SubResource( 19 )
+anims/action = SubResource( 10 )
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+bus = "InGame"
 
 [connection signal="timeout" from="AttackTimer" to="." method="_on_AttackTimer_timeout"]
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]
