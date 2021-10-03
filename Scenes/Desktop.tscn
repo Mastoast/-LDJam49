@@ -1,21 +1,24 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Sprites/desktop.png" type="Texture" id=1]
 [ext_resource path="res://Scenes/MMO.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Fonts/ARCADECLASSIC.TTF" type="DynamicFontData" id=3]
 [ext_resource path="res://Sprites/icons.png" type="Texture" id=4]
 [ext_resource path="res://Fonts/Retro Gaming.ttf" type="DynamicFontData" id=5]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
 
-var first = \"Oh no ! My ethernet cable is unplugged again. I need to fix that. The cable goes right next to the [ESCAPE] key on my keyboard\"
-var second = \"I knew i shouldn't have switched to a modern OS\"
-var third = \"\"
+var cable_text = \"I need to hold the cable next to my [ESCAPE] key\"
+var ok_text = \"Ok, i should be able to play now\"
+var event_text = [\"Oh no ! My ethernet cable is unplugged again. I need to fix that. The cable goes right next to the [ESCAPE] key on my keyboard\",
+\"I knew i shouldn't have switched to a modern OS\"]
 var text_windows = []
 var event_cnt = 0
+var known_connection = true
 
-var required_keys = [KEY_ESCAPE]
+var checkpoint = 0
+
+var required_keys = []
 
 func _ready():
 	$desktop/WindowDialog.popup_centered()
@@ -28,29 +31,45 @@ func _process(delta):
 		if !Input.is_key_pressed(key):
 			Global.is_connected = false
 			break
-
+	
+	if Global.spell_count > event_cnt:
+		event_cnt = Global.spell_count
+		handle_events()
+	
+	if known_connection != Global.is_connected:
+		known_connection = Global.is_connected
+		if Global.is_connected:
+			show_text(ok_text)
+			$AnimationPlayer.play_backwards(\"Zoom\")
+		else:
+			show_text(cable_text)
+			$AnimationPlayer.play(\"Zoom\")
+	
+	# handle connection
 	$desktop/WindowDialog/MMO.visible = Global.is_connected
 	$desktop/WindowDialog/DisconnectedScreen.visible = !Global.is_connected
-	
+
+	 # Print text in box
+	if $ColorRect/ColorRect2/RichTextLabel.visible_characters < $ColorRect/ColorRect2/RichTextLabel.text.length():
+		$ColorRect/ColorRect2/RichTextLabel.visible_characters += 1
+		
 	# DEBUG
 	if Input.is_action_just_pressed(\"ui_up\"):
 		$AnimationPlayer.play_backwards(\"Zoom\")
 	if Input.is_action_just_pressed(\"ui_down\"):
 		$AnimationPlayer.play(\"Zoom\")
-	if Input.is_action_just_pressed(\"ui_right\"):
-		Global.is_connected = !Global.is_connected
-	if Input.is_action_just_pressed(\"ui_left\"):
-		print_debug(Global.is_connected)
-		print_debug(Global.spell_count)
 
-	 # Print text in box
-	if $ColorRect/ColorRect2/RichTextLabel.visible_characters < $ColorRect/ColorRect2/RichTextLabel.text.length():
-		$ColorRect/ColorRect2/RichTextLabel.visible_characters += 1
+func handle_events():
+	if event_cnt == 1:
+		if required_keys.empty():
+			required_keys.append(KEY_ESCAPE)
+			$AnimationPlayer.play(\"Zoom\")
+			show_text(event_text[0])
 
 func show_text(text : String):
 	$ColorRect/ColorRect2/RichTextLabel.text = text
 	$ColorRect/ColorRect2/RichTextLabel.visible_characters = 0
-	$AnimationPlayer.play(\"speak\")
+#	$AnimationPlayer.play(\"speak\")
 "
 
 [sub_resource type="DynamicFont" id=5]
@@ -133,7 +152,7 @@ tracks/1/keys = {
 [sub_resource type="DynamicFont" id=3]
 size = 24
 extra_spacing_space = 2
-font_data = ExtResource( 3 )
+font_data = ExtResource( 5 )
 
 [node name="Desktop" type="Node2D"]
 pause_mode = 2
@@ -231,7 +250,8 @@ margin_top = 5.0
 margin_right = -5.0
 margin_bottom = -5.0
 custom_fonts/normal_font = SubResource( 3 )
-text = "this is a test"
+text = "this is a test [test]"
+scroll_active = false
 __meta__ = {
 "_edit_use_anchors_": false
 }

@@ -95,7 +95,7 @@ func handle_tutorial_text(heal_target):
 	align_text($tutorial_text)
 
 func _unhandled_key_input(event):
-	if !Input.is_action_pressed(\"ui_accept\"):
+	if !Input.is_action_pressed(\"ui_accept\") or !Global.is_connected:
 		return
 	# Add letters to the spell
 	var just_pressed = event.is_pressed() and not event.is_echo()
@@ -260,6 +260,7 @@ material = ExtResource( 4 )
 scale = Vector2( 5, 5 )
 frames = SubResource( 11 )
 animation = "idle"
+frame = 1
 playing = true
 
 [node name="target" type="Sprite" parent="."]
