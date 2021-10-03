@@ -1,50 +1,49 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Sprites/desktop.png" type="Texture" id=1]
 [ext_resource path="res://Scenes/MMO.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Fonts/ARCADECLASSIC.TTF" type="DynamicFontData" id=3]
+[ext_resource path="res://Sprites/icons.png" type="Texture" id=4]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
 
 var first = \"Oh no ! My ethernet cable is unplugged again. I need to fix that. The cable goes right next to the [ESCAPE] key on my keyboard\"
+var second = \"I knew i shouldn't have switched to a modern OS\"
+var third = \"\"
 var event_cnt = 0
+var text_windows = []
+
+var required_keys = []
 
 func _ready():
 	$desktop/WindowDialog.popup_centered()
 	$desktop/WindowDialog.get_close_button().hide()
 
 func _process(delta):
+	# Check connection	
+	var is_connected = true
+	for key in required_keys:
+		if !Input.is_key_pressed(key):
+			is_connected = false
+			break
+	$desktop/WindowDialog/MMO.set_connection(is_connected)
+
+	# DEBUG
 	if Input.is_action_just_pressed(\"ui_down\"):
 		$AnimationPlayer.play_backwards(\"Zoom\")
 	if Input.is_action_just_pressed(\"ui_left\"):
 		$AnimationPlayer.play(\"Zoom\")
 	if Input.is_action_just_pressed(\"ui_up\"):
 		show_text(first)
-		
-	if Input.is_action_just_pressed(\"ui_accept\"):
-		hide_text()
 	
 	if $ColorRect/ColorRect2/RichTextLabel.visible_characters < $ColorRect/ColorRect2/RichTextLabel.text.length():
 		$ColorRect/ColorRect2/RichTextLabel.visible_characters += 1
-
-func _input(event):
-	var just_pressed = event.is_pressed() and not event.is_echo()
-	if event.is_action_pressed(\"ui_accept\"):
-		hide_text()
 
 func show_text(text : String):
 	$ColorRect/ColorRect2/RichTextLabel.text = text
 	$ColorRect/ColorRect2/RichTextLabel.visible_characters = 0
 	$AnimationPlayer.play(\"speak\")
-	
-func hide_text():
-	$AnimationPlayer.play_backwards(\"speak\")
-
-
-func _on_AnimationPlayer_animation_finished(anim_name):
-	if anim_name == \"speak\":
-		pass
 "
 
 [sub_resource type="Animation" id=2]
@@ -136,7 +135,7 @@ margin_top = -149.517
 margin_right = 256.188
 margin_bottom = 150.483
 popup_exclusive = true
-window_title = "Simuventure Online"
+window_title = "Simuventure Online IV"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -156,10 +155,10 @@ anims/speak = SubResource( 4 )
 
 [node name="ColorRect" type="ColorRect" parent="."]
 pause_mode = 2
-margin_left = 76.7726
-margin_top = 620.0
-margin_right = 983.773
-margin_bottom = 733.0
+margin_left = 83.166
+margin_top = 8.84351
+margin_right = 990.166
+margin_bottom = 121.843
 color = Color( 0.109804, 0.109804, 0.109804, 1 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -191,6 +190,7 @@ __meta__ = {
 }
 
 [node name="Polygon2D" type="Polygon2D" parent="ColorRect/ColorRect2"]
+visible = false
 position = Vector2( 46, -1 )
 rotation = 0.00532731
 color = Color( 0.109804, 0.109804, 0.109804, 1 )
@@ -198,5 +198,10 @@ polygon = PoolVector2Array( 839, 101, 732.339, 101.268, 847, 181 )
 
 [node name="EventTimer" type="Timer" parent="."]
 wait_time = 10.0
+
+[node name="icons" type="Sprite" parent="."]
+position = Vector2( 982.992, 579.956 )
+scale = Vector2( 2, 2 )
+texture = ExtResource( 4 )
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]

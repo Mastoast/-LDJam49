@@ -86,11 +86,13 @@ func pause():
 	$text/TextTimer.stop()
 	$AnimatedSprite.playing = false
 	$AnimationPlayer.stop(false)
+	$ShaderAnimationPlayer.stop(false)
 
 func unpause():
 	$text/TextTimer.start()
 	$AnimatedSprite.playing = true
 	$AnimationPlayer.play()
+	$ShaderAnimationPlayer.play()
 "
 
 [sub_resource type="AtlasTexture" id=2]
@@ -217,7 +219,6 @@ material = ExtResource( 3 )
 scale = Vector2( 5, 5 )
 frames = SubResource( 8 )
 animation = "running"
-frame = 1
 playing = true
 flip_h = true
 

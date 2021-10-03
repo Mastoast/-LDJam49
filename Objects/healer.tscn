@@ -24,7 +24,7 @@ var tuto = [\"I need to hold [SPACE] to start casting\",
 \"Then i need to choose a target with [F1]/[F2]/[F3]\",
 \"Now, i can type my first spell name : [SUPPORT]\",
 \"Once my spell is ready, i only have to release the [SPACE] key\",
-\"One again, [SPACE] to cast\",
+\"Once again, [SPACE] to cast\",
 \"[F1]/[F2]/[F3] or none, if i want to heal myself\",
 \"[SUPPORT]\",
 \"Release [SPACE]\"
@@ -51,9 +51,9 @@ func _process(delta):
 	# Target players
 	var heal_target = self
 	if Input.is_key_pressed(KEY_F1):
-		heal_target = warrior
-	elif Input.is_key_pressed(KEY_F2):
 		heal_target = rogue
+	elif Input.is_key_pressed(KEY_F2):
+		heal_target = warrior
 	elif Input.is_key_pressed(KEY_F3):
 		heal_target = mage
 	
@@ -101,12 +101,23 @@ func _unhandled_key_input(event):
 	var just_pressed = event.is_pressed() and not event.is_echo()
 	if event.scancode >= 65 and event.scancode <= 90 and just_pressed:
 		current_spell += char(event.unicode).to_upper()
+	if event.scancode == KEY_BACKSPACE and just_pressed and !current_spell.empty():
+		current_spell.erase(current_spell.length() - 1, 1)
 
 func cast(spell : String, target : Object):
-	print_debug(\"CAST :\" + spell)
 	if spell == \"SUPPORT\":
 		target.heal(10)
 		spawn_particles(target.position)
+		#TODO Sound
+	if spell == \"RESURRECT\":
+		target.resurrect(10)
+		spawn_particles(target.position)
+		#TODO sound
+	if spell == \"FOUNTAIN\":
+		for node in [self, warrior, rogue, mage]:
+			node.heal(5)
+			spawn_particles(node.position)
+		# TODO sound
 	
 	spell_count += 1
 

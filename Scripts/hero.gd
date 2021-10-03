@@ -8,6 +8,7 @@ var target = Vector2()
 var damage = 5
 var hit_texts = ["ouch !", "I think my arm is broken", "I'm not paid enought for this"]
 var heal_texts = ["at last", "thx mate", "keep up"]
+var rez_texts = ["On the road again", "Never gonna give you up", "Stayin' alive"]
 
 func _ready():
 	$text.modulate = color
@@ -34,9 +35,12 @@ func heal(damage):
 	if randi()%100 < 25:
 		speak(hit_texts[randi()%heal_texts.size()])
 
-func ressurect():
-	$AnimatedSprite.animation = "running"
-	$AttackTimer.stop()
+func resurrect(damage):
+	if life <= 0:
+		life = damage
+		$AnimatedSprite.animation = "running"
+		$AttackTimer.stop()
+	speak(rez_texts[randi()%rez_texts.size()])
 
 func die():
 	$AnimatedSprite.animation = "dead"
@@ -75,3 +79,15 @@ func _on_AnimationPlayer_animation_finished(anim_name):
 
 func _on_TextTimer_timeout():
 	$text.text = ""
+
+func pause():
+	$text/TextTimer.stop()
+	$AnimatedSprite.playing = false
+	$AnimationPlayer.stop(false)
+	$ShaderAnimationPlayer.stop(false)
+
+func unpause():
+	$text/TextTimer.start()
+	$AnimatedSprite.playing = true
+	$AnimationPlayer.play()
+	$ShaderAnimationPlayer.play()

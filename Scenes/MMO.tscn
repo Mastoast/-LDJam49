@@ -17,19 +17,14 @@ var difficulty_index = 0
 
 var demon_node = preload(\"res://Objects/demon.tscn\")
 onready var spawn_points = [$SpawnPosition, $SpawnPosition2, $SpawnPosition3, $SpawnPosition4, $SpawnPosition5]
-var required_keys = []
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass
+	pass#open_popup()
 
 func _process(delta):
 	# check connection
-	is_connected = true
-	for key in required_keys:
-		if !Input.is_key_pressed(key):
-			is_connected = false
-			break
 	if !is_connected and !$Popup.visible:
 		open_popup()
 
@@ -46,6 +41,9 @@ func spawn(node, position):
 	new.z_index = 500
 	print_debug(new.z_index, new.z_as_relative)
 	self.add_child(new)
+
+func set_connection(connection):
+	self.is_connected = connection
 
 func open_popup():
 	$Popup.visible = true
