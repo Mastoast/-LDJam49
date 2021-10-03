@@ -21,12 +21,12 @@ var color = Color.darkolivegreen
 var current_spell = \"\"
 
 var tuto = [\"I need to hold [SPACE] to start casting\",
-\"Then i need to choose a target with [F1]/[F2]/[F3]\",
 \"Now, i can type my first spell name : [SUPPORT]\",
+\"Then i need to choose a target with [F1]/[F2]/[F3]\",
 \"My spell is ready, i only have to release [SPACE]\",
 \"Nice ! Once again, [SPACE] to cast\",
-\"[F1]/[F2]/[F3] or none, if i want to heal myself\",
 \"[SUPPORT]\",
+\"[F1]/[F2]/[F3] or none, if i want to heal myself\",
 \"Release [SPACE]\"
 ]
 
@@ -77,18 +77,18 @@ func handle_tutorial_text(heal_target):
 	if Global.spell_count == 0:
 		if !$target.visible:
 			$tutorial_text.text = tuto[0]
-		elif heal_target == self:
-			$tutorial_text.text = tuto[1]
 		elif current_spell != \"SUPPORT\":
+			$tutorial_text.text = tuto[1]
+		elif heal_target == self:
 			$tutorial_text.text = tuto[2]
 		else:
 			$tutorial_text.text = tuto[3]
 	if Global.spell_count == 1:
 		if !$target.visible:
 			$tutorial_text.text = tuto[4]
-		elif heal_target == self:
-			$tutorial_text.text = tuto[5]
 		elif current_spell != \"SUPPORT\":
+			$tutorial_text.text = tuto[5]
+		elif heal_target == self:
 			$tutorial_text.text = tuto[6]
 		else:
 			$tutorial_text.text = tuto[7]
@@ -115,7 +115,7 @@ func cast(spell : String, target : Object):
 		spawn_particles(target.position)
 		$HealAudio.play()
 	elif spell == \"RESURRECT\":
-		target.resurrect(10)
+		target.resurrect(25)
 		spawn_particles(target.position)
 		$HealAudio.play()
 	elif spell == \"FOUNTAIN\":

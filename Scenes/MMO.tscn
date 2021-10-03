@@ -43,6 +43,8 @@ func _process(delta):
 		$WinScreen.visible = true
 		return
 	if Global.player_alive <= 0:
+		$SpellsText.visible = false
+		$CommandText.visible = false
 		$GameOverScreen.visible = true
 		if Input.is_key_pressed(KEY_ENTER):
 			get_tree().reload_current_scene()

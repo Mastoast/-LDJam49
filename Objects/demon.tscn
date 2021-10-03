@@ -225,7 +225,6 @@ material = ExtResource( 3 )
 scale = Vector2( 5, 5 )
 frames = SubResource( 8 )
 animation = "running"
-frame = 1
 playing = true
 flip_h = true
 
