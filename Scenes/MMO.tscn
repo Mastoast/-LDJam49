@@ -22,8 +22,6 @@ func _ready():
 	pass
 	#create_label(\"this is a test\", $mage.position, $mage.color)
 
-
-
 func _process(delta):
 	var demons = get_tree().get_nodes_in_group(\"monster\")
 	if demons.size() == 0:
@@ -43,14 +41,13 @@ func create_label(text : String, position : Vector2, color : Color):
 
 func spawn(node, position):
 	var new = node.instance()
-	new.position = Vector2(position.x + rand_range(-20, 20), position.y + rand_range(-20, 20))
+	new.position = Vector2(position.x + rand_range(-50, 50), position.y + rand_range(-50, 50))
 	get_parent().add_child(new)
 
 
 func _on_Button_pressed():
-	if is_connected:
-		$Popup.visible = false
-	else:
+	$Popup.visible = false
+	if !is_connected:
 		open_popup()
 
 func open_popup():
@@ -106,6 +103,7 @@ font_data = ExtResource( 5 )
 script = SubResource( 1 )
 
 [node name="background" type="Node2D" parent="."]
+z_index = -5
 
 [node name="Background" type="Sprite" parent="background"]
 position = Vector2( 512, 300 )
@@ -163,6 +161,15 @@ region_rect = Rect2( 64, 0, 16, 16 )
 
 [node name="healer" parent="." instance=ExtResource( 1 )]
 position = Vector2( 255.179, 311.322 )
+
+[node name="warrior" parent="." instance=ExtResource( 2 )]
+position = Vector2( 428.159, 294.855 )
+
+[node name="mage" parent="." instance=ExtResource( 4 )]
+position = Vector2( 358.566, 392.509 )
+
+[node name="rogue" parent="." instance=ExtResource( 3 )]
+position = Vector2( 354.076, 227.507 )
 
 [node name="Wall" type="StaticBody2D" parent="."]
 position = Vector2( -19.5096, 298.597 )
@@ -308,15 +315,6 @@ position = Vector2( 727.593, 340.517 )
 
 [node name="SpawnPosition5" type="Position2D" parent="."]
 position = Vector2( 731.388, 256.432 )
-
-[node name="rogue" parent="." instance=ExtResource( 3 )]
-position = Vector2( 374.281, 251.079 )
-
-[node name="warrior" parent="rogue" instance=ExtResource( 2 )]
-position = Vector2( 53.8782, 43.776 )
-
-[node name="mage" parent="rogue" instance=ExtResource( 4 )]
-position = Vector2( -15.7144, 141.43 )
 
 [connection signal="timeout" from="TextLabel/Timer" to="TextLabel" method="_on_Timer_timeout"]
 [connection signal="pressed" from="Popup/Panel/Button" to="." method="_on_Button_pressed"]

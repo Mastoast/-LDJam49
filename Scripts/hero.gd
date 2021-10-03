@@ -7,6 +7,7 @@ var life = 100
 var color = Color.lightskyblue
 var target = Vector2()
 var damage = 5
+var hit_texts = ["ouch !"]
 
 func _ready():
 	connect("spawn_text", self.get_parent(), "create_label")
@@ -21,6 +22,10 @@ func hit(damage):
 	life = max(0, life - damage)
 	if life <= 0:
 		die()
+		return true
+	$ShaderAnimationPlayer.play("hit")
+	if randi()%100 < 15:
+		emit_signal("spawn_text", hit_texts[randi()%hit_texts.size()], self.position, self.color)
 
 func die():
 	$AnimatedSprite.animation = "dead"

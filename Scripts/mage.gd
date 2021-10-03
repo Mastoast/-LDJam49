@@ -8,10 +8,10 @@ func _ready():
 
 func _process(delta):
 	if Input.is_action_just_pressed("ui_accept"):
-		shoot()
+		pass
 
 func shoot():
-	emit_signal("spawn_text", "test", self.position, self.color)
+	emit_signal("spawn_text", "BOOM !", self.position, self.color)
 	$AnimatedSprite.play("attacking")
 	var new_ball = fireball.instance()
 	get_parent().add_child(new_ball)
