@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=22 format=2]
 
 [ext_resource path="res://Objects/healer.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Objects/warrior.tscn" type="PackedScene" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://Fonts/Retro Gaming.ttf" type="DynamicFontData" id=6]
 [ext_resource path="res://Shaders/test_shader.tres" type="Material" id=7]
 [ext_resource path="res://Sprites/environement.png" type="Texture" id=8]
+[ext_resource path="res://sound/Isek.wav" type="AudioStream" id=9]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
@@ -477,5 +478,13 @@ scroll_active = false
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="Music" type="AudioStreamPlayer2D" parent="."]
+position = Vector2( 514.629, 299.359 )
+stream = ExtResource( 9 )
+volume_db = -9.0
+autoplay = true
+attenuation = 0.0
+bus = "InGame"
 
 [connection signal="pressed" from="Popup/Panel/Button" to="." method="_on_Button_pressed"]
