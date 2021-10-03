@@ -1,18 +1,16 @@
 extends KinematicBody2D
 
 const WALK_SPEED = 5
-signal spawn_text(text, position, color)
 
 var life = 100
 var color = Color.lightskyblue
 var target = Vector2()
 var damage = 5
-var hit_texts = ["ouch !"]
+var hit_texts = ["ouch !", "I think my arm is broken", "I'm not paid enought for this"]
+var heal_texts = ["at last", "thx mate", "keep up"]
 
 func _ready():
-	connect("spawn_text", self.get_parent(), "create_label")
-	$AttackTimer.paused = false
-	$AttackTimer.start()
+	$text.modulate = color
 
 func _process(delta):
 	# UI
@@ -25,10 +23,33 @@ func hit(damage):
 		return true
 	$ShaderAnimationPlayer.play("hit")
 	if randi()%100 < 15:
-		emit_signal("spawn_text", hit_texts[randi()%hit_texts.size()], self.position, self.color)
+		var text = hit_texts[randi()%hit_texts.size()]
+		print_debug(text)
+		speak(text)
+
+func heal(damage):
+	if life <= 0:
+		return
+	life = min(life + damage, 100)
+	if randi()%100 < 25:
+		speak(hit_texts[randi()%heal_texts.size()])
+
+func ressurect():
+	$AnimatedSprite.animation = "running"
+	$AttackTimer.stop()
 
 func die():
 	$AnimatedSprite.animation = "dead"
+	$AttackTimer.stop()
+
+func speak(text : String):
+	$text.text = text
+	align_text()
+	$text/TextTimer.start()
+
+func align_text():
+	$text.rect_size.x = $text.get_font("normal_font").get_string_size($text.text).x
+	$text.rect_position.x = - $text.rect_size.x / 2
 
 func get_random_alive_target(group_name):
 	var nodes = get_tree().get_nodes_in_group(group_name)
@@ -51,3 +72,6 @@ func _on_AnimationPlayer_animation_finished(anim_name):
 	if anim_name == "action":
 		var aim = get_random_alive_target("monster")
 		aim.hit(damage)
+
+func _on_TextTimer_timeout():
+	$text.text = ""

@@ -7,6 +7,7 @@ colors = PoolColorArray( 0.725586, 0.333874, 0.0680237, 1, 0.803922, 0.640725, 0
 
 [node name="fire_explosion" type="CPUParticles2D"]
 scale = Vector2( 4, 4 )
+z_index = -1
 emitting = false
 amount = 32
 lifetime = 0.5

@@ -9,9 +9,9 @@ colors = PoolColorArray( 0.102777, 0.404785, 0.180934, 1, 0.356105, 0.760254, 0.
 [node name="heal_particles" type="CPUParticles2D"]
 scale = Vector2( 4, 4 )
 emitting = false
-amount = 4
-lifetime = 0.5
+amount = 32
 one_shot = true
+explosiveness = 0.38
 emission_shape = 3
 emission_points = PoolVector2Array(  )
 emission_colors = PoolColorArray(  )

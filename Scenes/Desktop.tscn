@@ -1,0 +1,202 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://Sprites/desktop.png" type="Texture" id=1]
+[ext_resource path="res://Scenes/MMO.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Fonts/ARCADECLASSIC.TTF" type="DynamicFontData" id=3]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+var first = \"Oh no ! My ethernet cable is unplugged again. I need to fix that. The cable goes right next to the [ESCAPE] key on my keyboard\"
+var event_cnt = 0
+
+func _ready():
+	$desktop/WindowDialog.popup_centered()
+	$desktop/WindowDialog.get_close_button().hide()
+
+func _process(delta):
+	if Input.is_action_just_pressed(\"ui_down\"):
+		$AnimationPlayer.play_backwards(\"Zoom\")
+	if Input.is_action_just_pressed(\"ui_left\"):
+		$AnimationPlayer.play(\"Zoom\")
+	if Input.is_action_just_pressed(\"ui_up\"):
+		show_text(first)
+		
+	if Input.is_action_just_pressed(\"ui_accept\"):
+		hide_text()
+	
+	if $ColorRect/ColorRect2/RichTextLabel.visible_characters < $ColorRect/ColorRect2/RichTextLabel.text.length():
+		$ColorRect/ColorRect2/RichTextLabel.visible_characters += 1
+
+func _input(event):
+	var just_pressed = event.is_pressed() and not event.is_echo()
+	if event.is_action_pressed(\"ui_accept\"):
+		hide_text()
+
+func show_text(text : String):
+	$ColorRect/ColorRect2/RichTextLabel.text = text
+	$ColorRect/ColorRect2/RichTextLabel.visible_characters = 0
+	$AnimationPlayer.play(\"speak\")
+	
+func hide_text():
+	$AnimationPlayer.play_backwards(\"speak\")
+
+
+func _on_AnimationPlayer_animation_finished(anim_name):
+	if anim_name == \"speak\":
+		pass
+"
+
+[sub_resource type="Animation" id=2]
+resource_name = "Zoom"
+tracks/0/type = "bezier"
+tracks/0/path = NodePath("CameraInGame:zoom:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"points": PoolRealArray( 0.5, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 1 )
+}
+tracks/1/type = "bezier"
+tracks/1/path = NodePath("CameraInGame:zoom:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"points": PoolRealArray( 0.5, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 1 )
+}
+tracks/2/type = "bezier"
+tracks/2/path = NodePath("CameraInGame:position:x")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"points": PoolRealArray( 512, -0.25, 0, 0.25, 0, 512, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 1 )
+}
+tracks/3/type = "bezier"
+tracks/3/path = NodePath("CameraInGame:position:y")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"points": PoolRealArray( 300, -0.25, 0, 0.25, 0, 300, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 1 )
+}
+
+[sub_resource type="Animation" id=4]
+resource_name = "speak"
+tracks/0/type = "bezier"
+tracks/0/path = NodePath("ColorRect:rect_position:y")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"points": PoolRealArray( 620, -0.25, 0, 0.677088, -50.5753, 400, -0.262727, -106.48, 0.25, 0 ),
+"times": PoolRealArray( 0, 1 )
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("ColorRect:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.001, 0.1, 0.999998 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 1,
+"values": [ false, false, true, true ]
+}
+
+[sub_resource type="DynamicFont" id=3]
+size = 24
+extra_spacing_space = 1
+font_data = ExtResource( 3 )
+
+[node name="Desktop" type="Node2D"]
+pause_mode = 2
+script = SubResource( 1 )
+
+[node name="desktop" type="Sprite" parent="."]
+position = Vector2( 512, 300 )
+z_index = -20
+texture = ExtResource( 1 )
+
+[node name="WindowDialog" type="WindowDialog" parent="desktop"]
+visible = true
+margin_left = -255.812
+margin_top = -149.517
+margin_right = 256.188
+margin_bottom = 150.483
+popup_exclusive = true
+window_title = "Simuventure Online"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MMO" parent="desktop/WindowDialog" instance=ExtResource( 2 )]
+scale = Vector2( 0.5, 0.5 )
+
+[node name="CameraInGame" type="Camera2D" parent="."]
+position = Vector2( 512, 300 )
+current = true
+zoom = Vector2( 0.5, 0.5 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+pause_mode = 2
+anims/Zoom = SubResource( 2 )
+anims/speak = SubResource( 4 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+pause_mode = 2
+margin_left = 76.7726
+margin_top = 620.0
+margin_right = 983.773
+margin_bottom = 733.0
+color = Color( 0.109804, 0.109804, 0.109804, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect2" type="ColorRect" parent="ColorRect"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 5.0
+margin_top = 5.0
+margin_right = -5.0
+margin_bottom = -5.0
+color = Color( 0.227451, 0.227451, 0.227451, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ColorRect/ColorRect2"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 5.0
+margin_top = 5.0
+margin_right = -5.0
+margin_bottom = -5.0
+custom_fonts/normal_font = SubResource( 3 )
+text = "this is a test"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Polygon2D" type="Polygon2D" parent="ColorRect/ColorRect2"]
+position = Vector2( 46, -1 )
+rotation = 0.00532731
+color = Color( 0.109804, 0.109804, 0.109804, 1 )
+polygon = PoolVector2Array( 839, 101, 732.339, 101.268, 847, 181 )
+
+[node name="EventTimer" type="Timer" parent="."]
+wait_time = 10.0
+
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]

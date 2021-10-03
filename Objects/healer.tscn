@@ -18,6 +18,18 @@ var velocity = Vector2()
 var color = Color.darkolivegreen
 var current_spell = \"\"
 
+var spell_count = 0
+
+var tuto = [\"I need to hold [SPACE] to start casting\",
+\"Then i need to choose a target with [F1]/[F2]/[F3]\",
+\"Now, i can type my first spell name : [SUPPORT]\",
+\"Once my spell is ready, i only have to release the [SPACE] key\",
+\"One again, [SPACE] to cast\",
+\"[F1]/[F2]/[F3] or none, if i want to heal myself\",
+\"[SUPPORT]\",
+\"Release [SPACE]\"
+]
+
 var warrior
 var rogue
 var mage
@@ -31,10 +43,11 @@ func _process(delta):
 	# UI
 	$HealthBar.value = life
 	$target.rotation_degrees += 30 * delta
+	$target/target_bis.rotation_degrees -= 60 * delta
 	$target.visible = Input.is_action_pressed(\"ui_accept\")
 	$text.text = current_spell
-	align_text()
-	
+	align_text($text)
+
 	# Target players
 	var heal_target = self
 	if Input.is_key_pressed(KEY_F1):
@@ -46,14 +59,40 @@ func _process(delta):
 	
 	$target.position = heal_target.position - self.position
 	
+	handle_tutorial_text(heal_target)
+	
 	if Input.is_action_just_pressed(\"ui_accept\"):
 		$AnimatedSprite.play(\"attacking\")
 	
 	if Input.is_action_just_released(\"ui_accept\"):
 		$AnimatedSprite.play(\"idle\")
 		if current_spell != \"\":
-			cast(current_spell)
+			cast(current_spell, heal_target)
 			current_spell = \"\"
+
+func handle_tutorial_text(heal_target):
+	if spell_count > 1:
+		$tutorial_text.text = \"\"
+		return
+	if spell_count == 0:
+		if !$target.visible:
+			$tutorial_text.text = tuto[0]
+		elif heal_target == self:
+			$tutorial_text.text = tuto[1]
+		elif current_spell != \"SUPPORT\":
+			$tutorial_text.text = tuto[2]
+		else:
+			$tutorial_text.text = tuto[3]
+	if spell_count == 1:
+		if !$target.visible:
+			$tutorial_text.text = tuto[4]
+		elif heal_target == self:
+			$tutorial_text.text = tuto[5]
+		elif current_spell != \"SUPPORT\":
+			$tutorial_text.text = tuto[6]
+		else:
+			$tutorial_text.text = tuto[7]
+	align_text($tutorial_text)
 
 func _unhandled_key_input(event):
 	if !Input.is_action_pressed(\"ui_accept\"):
@@ -63,9 +102,13 @@ func _unhandled_key_input(event):
 	if event.scancode >= 65 and event.scancode <= 90 and just_pressed:
 		current_spell += char(event.unicode).to_upper()
 
-func cast(spell : String):
+func cast(spell : String, target : Object):
 	print_debug(\"CAST :\" + spell)
-	print_debug($text.get_font(\"normal_font\").get_string_size(current_spell))
+	if spell == \"SUPPORT\":
+		target.heal(10)
+		spawn_particles(target.position)
+	
+	spell_count += 1
 
 func hit(damage):
 	life = max(0, life - damage)
@@ -74,13 +117,20 @@ func hit(damage):
 		return true
 	$ShaderAnimationPlayer.play(\"hit\")
 
+func spawn_particles(position : Vector2):
+	var new_parts = heal_particles.instance()
+	new_parts.position = position
+	get_parent().add_child(new_parts)
+
+func heal(damage):
+	life = min(life + damage, 100)
+
 func die():
 	$AnimatedSprite.animation = \"dead\"
 	
-func align_text():
-	#$text.rect_size = Vector2(current_spell.length() * 16, $text.rect_size.y)
-	$text.rect_size.x = $text.get_font(\"normal_font\").get_string_size(current_spell).x
-	$text.rect_position.x = - $text.rect_size.x / 2
+func align_text(text_node):
+	text_node.rect_size.x = text_node.get_font(\"normal_font\").get_string_size(text_node.text).x
+	text_node.rect_position.x = - text_node.rect_size.x / 2
 "
 
 [sub_resource type="AtlasTexture" id=2]
@@ -199,12 +249,16 @@ material = ExtResource( 4 )
 scale = Vector2( 5, 5 )
 frames = SubResource( 11 )
 animation = "idle"
-frame = 1
 playing = true
 
 [node name="target" type="Sprite" parent="."]
-modulate = Color( 0.0666667, 0.466667, 0.0745098, 1 )
+modulate = Color( 0.137255, 0.647059, 0.145098, 1 )
 scale = Vector2( 4, 4 )
+texture = ExtResource( 5 )
+
+[node name="target_bis" type="Sprite" parent="target"]
+modulate = Color( 1, 1, 1, 0.584314 )
+scale = Vector2( 1.5, 1.5 )
 texture = ExtResource( 5 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -228,6 +282,23 @@ modulate = Color( 0.054902, 0.713726, 0.109804, 1 )
 margin_left = -58.0
 margin_top = -79.0
 margin_bottom = -59.0
+grow_horizontal = 2
+grow_vertical = 0
+custom_fonts/normal_font = SubResource( 13 )
+meta_underlined = false
+text = "test"
+scroll_active = false
+__meta__ = {
+"_edit_use_anchors_": false,
+"_editor_description_": ""
+}
+
+[node name="tutorial_text" type="RichTextLabel" parent="."]
+modulate = Color( 0.054902, 0.713726, 0.109804, 1 )
+margin_left = -27.2758
+margin_top = -110.806
+margin_right = 30.7242
+margin_bottom = -90.8063
 grow_horizontal = 2
 grow_vertical = 0
 custom_fonts/normal_font = SubResource( 13 )
